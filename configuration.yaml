@@ -1,0 +1,761 @@
+
+# Configure a default setup of Home Assistant (frontend, api, etc)
+homeassistant:
+
+
+  customize: !include customize.yaml
+
+
+# Text to speech
+tts:
+  - platform: google_translate
+
+
+
+zwave:
+
+  usb_path: /dev/ttyACM0
+  config_path: /config/z-wave/open-zwave/config/  
+
+#zigbee:
+#  device: /dev/ttyUSB4
+#  name: 'zigbee'
+
+#zha:
+#  usb_path: auto
+#  usb_path: /dev/ttyACM1
+#  database_path: /config/zigbee/zigbee.db
+  
+frontend:
+
+  themes: !include_dir_merge_named themes
+#python_script:
+
+  javascript_version: auto
+  extra_html_url:
+    - /local/custom_ui/state-card-iframe.html
+    - /local/custom_ui/lovelace-iframe.html
+  extra_html_url_es5:
+    - /local/custom_ui/state-card-iframe-es5.html
+    - /local/custom_ui/lovelace-iframe.html
+
+
+config:
+  
+
+http:
+  base_url: https://panoramabar.duckdns.org:8123
+  ssl_certificate: /ssl/fullchain.pem
+  ssl_key: /ssl/privkey.pem
+  ssl_profile: intermediate
+
+
+ios:
+
+
+  push:
+    categories:
+      - name: arrive
+        identifier: 'ARRIVE'
+        actions:
+          - identifier: 'COVERAUF'
+            title: 'coverauf'
+            activationMode: 'background'
+            authenticationRequired: true
+            destructive: false
+            behavior: 'default'
+          - identifier: 'BLINDSUP'
+            title: 'blindsup'
+            activationMode: 'background'
+            authenticationRequired: true
+            destructive: false
+            behavior: 'default'
+
+#########################################################################
+lovelace:
+  mode: yaml
+
+# Discover some devices automatically
+discovery:
+
+# Allows you to issue voice commands from the frontend in enabled browsers
+#conversation:
+
+# Enables support for tracking state changes over time
+history:
+  # use_include_order: True
+   exclude:
+     domains:
+       - updater
+#       - scenes
+#       - automations
+#       - scripts
+#       - weather
+#       - media_player
+#     entities:
+      # - sensor.tado_unten_temperature
+
+####################################################
+system_health:
+
+# View all events in a logbook
+logbook:
+
+# Enables a map showing the location of tracked devices
+map:
+
+# Track the sun
+sun:
+
+
+auto_backup:
+  auto_purge: true
+
+# Text to speech
+#tts:
+#  - platform: google_translate
+#    service_name: google_say
+
+# Cloud
+cloud:
+
+mobile_app:
+
+
+group: !include groups.yaml
+automation: !include automations.yaml
+script: !include scripts.yaml
+scene: !include scenes.yaml
+
+
+# Weekday SENSOR
+
+
+############################################## BINARY SENSORS ##########################
+
+binary_sensor:
+  - platform: workday
+    country: DE
+    workdays: [mon, tue, wed, thu, fri]
+
+# temperatur vergleiche als binary also "on" wenn es zutrifft
+
+
+  - platform: template
+    sensors:
+      coolinside:
+        friendly_name: "Innen kühler"
+        value_template: "{{(states.sensor.tado_unten_temperature.state | float ) < (states.sensor.netatmo_base_outdoor_temperature.state | float)}}"
+        
+  - platform: template
+    sensors:
+      cooloutside:
+        friendly_name: "Draussen kühler"
+        value_template: "{{(states.sensor.tado_unten_temperature.state | float ) > (states.sensor.netatmo_base_outdoor_temperature.state | float)}}"
+
+  - platform: template
+    sensors:
+      itsraining:
+        friendly_name: "Es regnet"
+        value_template: "{{(states.sensor.zamg_precipitation.state | float ) > 1 }}"
+
+
+sensor:
+
+# power supply raspberry
+  - platform: rpi_power
+    text_state: true
+
+  - platform: template
+    sensors: 
+      balkontuer_test:
+#        sensor_class: door
+        friendly_name: Front Door
+        value_template: " {{ is_state('sensor.fibaro_system_fgdw002_door_opening_sensor_2_access_control_2', '22') if states('sensor.') in ['22','23'] else states('binary_sensor.fibaro_system_fgdw002_door_opening_sensor_2_sensor_3') == 'on' }} "
+
+
+  - platform: template
+    sensors:
+      sonosmode:
+        value_template: '{{states.media_player.wohnzimmer.attributes.source }}'
+        friendly_name: 'Sonos Wohnzimmer Source'
+        entity_id: media_player.wohnzimmer
+
+# strompreis berechnen
+
+  - platform: template
+    sensors:
+      stromkosten_kueche:
+        unit_of_measurement: €
+        friendly_name: "Stromkosten"
+        value_template: "{{ states('sensor.light_kueche_energy_2') | round(4, 'floor') * 0.2 }}"
+
+
+  - platform: template
+    sensors:
+      stromkosten_essen:
+        unit_of_measurement: €
+        friendly_name: "Stromkosten"
+        value_template: "{{ states('sensor.light_kueche_energy') | round(4, 'floor') * 0.2 }}"
+        
+  - platform: template
+    sensors:
+      stromkosten_radiator:
+        unit_of_measurement: €
+        friendly_name: "Stromkosten"
+        value_template: "{{ states('sensor.fibaro_system_fgwpe_f_wall_plug_gen5_energy') | round(4, 'floor') * 0.2 }}"
+
+  - platform: template
+    sensors:
+      stromkosten_summe:
+        unit_of_measurement: €
+        friendly_name: "Stromkosten dieses Monat"
+        value_template: "{{ states('sensor.stromkosten_radiator') | round(4, 'floor') + states('sensor.stromkosten_essen') | round(4, 'floor') + states('sensor.stromkosten_kueche') | round(4, 'floor') }}"
+
+
+# Zeit und Datum
+
+  - platform: time_date
+
+# Netatmo Sensoren
+
+  - platform: netatmo
+    station: base
+    modules:
+      - outdoor
+      - zimmer
+      
+#      outdoor:
+#        - temperature
+#        - humidity
+#        - rf_status
+#      zimmer:
+#        - temperature
+#        - humidity
+#        - min_temp
+#        - max_temp
+        
+#########################################################
+###################### Template Sensoren 
+#########################################################
+
+  # - platform: mqtt
+    # state_topic: "dummy/downstairslitterbox/count"
+    # name: Downstairs Litter Box Visits
+    # unit_of_measurement: "visits"        
+       
+
+#################################### Katzenklo Sensor
+
+  - platform: template
+    sensors:
+      downstairs_litter_box_visits:
+        value_template: "{{ states.input_number.litter_visits }}"
+        unit_of_measurement: "visits"        
+
+ 
+
+
+# Someone at Home Sensor
+
+  - platform: template
+    sensors: 
+      martin_home:
+        value_template: '{% if is_state("device_tracker.martiniphone", "home") or is_state("device_tracker.martiniphone", "home" ) %}home{% else %}away{% endif %}'
+      kathi_home:
+        value_template: '{% if is_state("device_tracker.kathrins_iphone", "home") or is_state("device_tracker.kathrins_iphone", "home" ) %}home{% else %}away{% endif %}'
+      ###### das ist der EIGENTLICHE Sensor geht auf HOME MODE wenn einer von den beiden oben zutrifft!!!
+      occupancy_status:
+        value_template: '{% if is_state("sensor.martin_home", "home") or is_state("sensor.kathi_home", "home" ) %}HOME_MODE{% else %}AWAY_MODE{% endif %}'
+
+
+
+####### KLIMA Sensoren (Berechnungen, Mittelwerte usw)
+
+# in vs out sensor
+
+
+  - platform: template
+    sensors:
+      outside_vs_inside_temp:
+        value_template: "{% if states.sensor.tado_unten_temperature.state | round(0, 'floor') < states.sensor.netatmo_base_outdoor_temperature.state | round(0, 'ceil') %}INNEN kühler{% else %} AUSSEN kühler{%endif %}"
+        friendly_name: "wo is kühler"
+
+
+################################################################################
+
+# außen minus innen
+
+  - platform: template
+    sensors:
+      in_out_temp_diff:
+        value_template: "{{ states('sensor.netatmo_base_outdoor_temperature') | round(0, 'floor') - states('sensor.tado_unten_temperature') | round(0, 'floor') }}"      
+        friendly_name: "Temp. Unterschied"
+        unit_of_measurement: '°C'
+
+
+# prozent
+
+
+#  - platform: template
+#    sensors:
+ #     prozentdif:
+#        value_template: "{{ (states('sensor.tado_unten_temperature') | round(0, 'floor') // '100') * states('sensor.in_out_temp_diff') | round(0, 'floor') }}"      
+ #       friendly_name: "%Temp. Unterschied"
+ #       unit_of_measurement: '%'
+
+
+
+
+
+########## Statistic Sensors
+
+
+  - platform: statistics
+    entity_id: sensor.home
+    
+
+
+####################          Umbenennen von Sensor Werten in Text           ###############
+############################################################################
+       
+
+################ Template Sensor (damit offen und geschlossen dort steht) wird aus dem zwave sensor berechnet
+
+# Fenster SCHLAFZIMMER
+
+  - platform: template
+    sensors:
+      fenster_sz_status:
+        friendly_name: Schlafzimmer Fenster
+        value_template: >-
+          {% if is_state('sensor.fibaro_system_fgdw002_door_opening_sensor_2_access_control', '22') %}
+            offen
+          {% elif is_state('sensor.fibaro_system_fgdw002_door_opening_sensor_2_access_control', '23') %}
+            geschlossen
+          {% else %}
+            FEHLER
+          {% endif %}
+        icon_template: >-
+          {% if is_state('sensor.fibaro_system_fgdw002_door_opening_sensor_2_access_control', '22') %}
+            mdi:window-open
+          {% else %}
+            mdi:window-closed
+          {% endif %}
+
+# Balkontür          
+       
+          
+  - platform: template
+    sensors:
+      balkontuer:
+        friendly_name: Balkontür
+        value_template: >-
+          {% if is_state('sensor.fibaro_system_fgdw002_door_opening_sensor_2_access_control_2', '22') %}
+            offen
+          {% elif is_state('sensor.fibaro_system_fgdw002_door_opening_sensor_2_access_control_2', '23') %}
+            geschlossen
+          {% else %}
+            FEHLER
+          {% endif %}
+        icon_template: >-
+          {% if is_state('sensor.fibaro_system_fgdw002_door_opening_sensor_2_access_control_2', '22') %}
+            mdi:window-open
+          {% else %}
+            mdi:window-closed
+          {% endif %}
+          
+
+
+# Wohnzimmer Fenster       
+  - platform: template
+    sensors:
+      wohnzimmerfenster:
+        friendly_name: Wohnzimmer Fenster
+        value_template: >-
+          {% if is_state('binary_sensor.doorsensor', 'on') %}
+            offen
+          {% elif is_state('binary_sensor.doorsensor', 'off') %}
+            geschlossen
+          {% else %}
+            FEHLER
+          {% endif %}
+        icon_template: >-
+          {% if is_state('binary_sensor.doorsensor', 'on') %}
+            mdi:window-open
+          {% else %}
+            mdi:window-closed
+          {% endif %}          
+#################################################################################
+
+
+
+  - platform: systemmonitor
+    resources:
+      - type: memory_use
+      - type: processor_use
+      - type: load_5m
+      - type: process
+      - type: last_boot
+      - type: ipv6_address
+      - type: network_in
+        arg: eth0
+      - type: network_out
+        arg: eth0
+      - type: disk_use_percent
+        arg: /      
+      - type: disk_free
+        arg: /
+
+
+############################################################
+################### Wetter und Klima ######
+############################################################
+# YR Wetter
+
+  - platform: yr
+    name: YR Wetter
+    forecast: 48
+    scan_interval: '00:10:00'
+    monitored_conditions:
+      - temperature
+      - symbol
+      - precipitation
+      - windSpeed
+      - pressure
+      - windDirection
+      - humidity
+      - fog
+      - cloudiness
+      - lowClouds
+      - mediumClouds
+      - highClouds
+      - dewpointTemperature
+
+      
+# dark sky
+  - platform: darksky
+    api_key: b31f1667e0c4babc6499d45285c09574
+    language: de
+    scan_interval: '00:10:00'
+    forecast: 
+      - 2
+    monitored_conditions:
+      - summary
+      - cloud_cover
+      - hourly_summary
+      - precip_probability
+      - apparent_temperature_high
+      - uv_index
+      - apparent_temperature
+      - moon_phase
+      - sunrise_time
+      - sunset_time
+      - nearest_storm_distance
+      - ozone
+      - daily_summary
+      - temperature_high   
+      - precip_intensity
+
+
+  - platform: zamg
+    station_id: 11035
+    name: ZAMG
+    monitored_conditions:
+      - temperature
+      - humidity
+      - precipitation
+      - sun_last_hour
+      - wind_speed
+
+###################### Wettersensoren und Dienste
+weather:
+
+# dark sky
+  - platform: darksky
+    api_key: b31f1667e0c4babc6499d45285c09574
+    # name: dark_sky_wetter
+    # language: de    
+
+ 
+# ZAMG SENSOR
+  - platform: zamg
+    station_id: 11035
+    name: ZAMG Wetter
+    # monitored_conditions:
+      # - temperature
+      # - humidity
+      # - sun_last_hour
+      # - wind_speed
+############# Geräte (appleTV, chromecast,...) #######################
+
+cast:
+  media_player:
+    - host: 192.168.0.18
+
+apple_tv:
+  - host: 192.168.0.12
+    login_id: 00000000-1045-4316-f8d0-a8f332dd4c9f
+#    name: NAME_1
+#    start_off: START_OFF_1
+#    credentials: CREDENTIALS_1
+
+################## >>>>>>>> KLIMAZONEN <<<<<<< ###########################
+
+climate:
+
+# Zimmer
+  - platform: generic_thermostat
+    name: zimmer
+    heater: switch.fibaro_system_fgs223_double_relay_switch_5
+    target_sensor: sensor.aeon_labs_zw100_multisensor_6_temperature
+    min_temp: 16
+    max_temp: 23
+    ac_mode: False
+    target_temp: 18
+    cold_tolerance: 0.3
+    hot_tolerance: 0
+    min_cycle_duration:
+      seconds: 60
+    # keep_alive:
+      # minutes: 3
+#    initial_hvac_mode: "off"
+    away_temp: 17
+    precision: 0.1
+    
+# Schlafzimmer
+  - platform: generic_thermostat
+    name: Schlafzimmer
+    heater: switch.fibaro_system_fgs223_double_relay_switch
+    target_sensor: sensor.netatmo_base_zimmer_temperature
+    min_temp: 16
+    max_temp: 23
+    ac_mode: False
+    target_temp: 18
+    cold_tolerance: 0.3
+    hot_tolerance: 0
+    min_cycle_duration:
+      seconds: 60
+    # keep_alive:
+      # minutes: 3
+#    initial_hvac_mode: "on"
+    away_temp: 17
+    precision: 0.1
+    
+# Wohnzimmer
+  - platform: generic_thermostat
+    name: Wohnzimmer
+    heater: climate.tado_unten
+    target_sensor: sensor.tado_unten_temperature
+    min_temp: 16
+    max_temp: 23
+    ac_mode: False
+#    target_temp: 18
+#    cold_tolerance: 0.3
+#    hot_tolerance: 0
+#    min_cycle_duration:
+#      seconds: 5
+    # keep_alive:
+      # minutes: 3
+    #initial_operation_mode: "off"
+#    away_temp: 16
+    precision: 0.1
+    
+
+# tado
+tado:
+  username: greilberger@me.com
+  password: hodgas-paTtuc-cympe0
+  fallback: false
+
+
+
+############################################# Recorder
+
+recorder:
+  db_url: mysql://homeassistant:Op3rat0r9400@core-mariadb:3306/homeassistant
+
+  purge_keep_days: 3
+  purge_interval: 1
+  exclude:
+    domains:
+      #- device_tracker
+      # - automation
+#      - scene
+      #- script
+#      - weblink
+#      - updater
+      #- weather
+    entities:
+      - sensor.kathi_home
+      - sensor.martin_home
+
+###################### COVER ##################################
+cover:
+  - platform: zwave
+    name: "jalousie"
+    set_position_topic: "soma/shade/rise201/set"
+    state_topic: "soma/shade/rise201/state"
+    retain: false
+
+
+########################
+#                              Frontend inputs 
+########################
+
+input_boolean:
+  away_mode:
+    name: AWAY_MODE
+    initial: off
+    icon: mdi:car
+
+input_select:
+  jahreszeit:
+    name: Jahreszeit
+    options:
+      - "Sommer"
+      - "Winter"
+    # initial: Anne Therese
+    # icon: mdi:panda
+
+
+input_number:
+
+  litter_visits:
+    name: litter visits
+    unit_of_measurement: Visits
+    icon: mdi:cat
+    min: 0
+    max: 10
+    step: 1
+
+
+
+
+############################################################ Heizung
+
+# Einstellung der aktuellen Soll Temperatur 
+##### auf diese Temperatur wird sofort reagiert
+  temp_zimmer:
+    name: Soll Zimmer
+    unit_of_measurement: °C
+    icon: mdi:temperature-celsius
+#    initial: 17
+    min: 18
+    max: 23
+    step: 0.5
+
+
+
+################################ SCHLAFZIMMER
+  temp_schlafzimmer:
+    name: Soll Schlafzimmer
+    unit_of_measurement: °C
+    icon: mdi:temperature-celsius
+#    initial: 18
+    min: 18
+    max: 22
+    step: 0.5
+#————————————————————————————————————————
+
+# Einstellung der Soll Temperaturen die von Automations zu bestimmter Zeit eingestellt werden
+
+################## 1
+
+  temp_soll_zimmer1:
+    name: zimmer
+    unit_of_measurement: °C
+    icon: mdi:temperature-celsius
+
+    min: 17
+    max: 22
+    step: 0.5
+
+  temp_soll_schlafzimmer1:
+    name: schlafzimmer
+    unit_of_measurement: °C
+    icon: mdi:temperature-celsius
+
+    min: 18
+    max: 22
+    step: 0.5
+
+#################### 2
+
+  temp_soll_zimmer2:
+    name: zimmer
+    unit_of_measurement: °C
+    icon: mdi:temperature-celsius
+
+    min: 18
+    max: 22
+    step: 0.5
+
+  temp_soll_schlafzimmer2:
+    name: schlafzimmer
+    unit_of_measurement: °C
+    icon: mdi:temperature-celsius
+
+    min: 18
+    max: 22
+    step: 0.5
+
+################# 3
+
+  temp_soll_zimmer3:
+    name: zimmer
+    unit_of_measurement: °C
+    icon: mdi:temperature-celsius
+
+    min: 18
+    max: 22
+    step: 0.5
+
+  temp_soll_schlafzimmer3:
+    name: schlafzimmer
+    unit_of_measurement: °C
+    icon: mdi:temperature-celsius
+
+    min: 18
+    max: 22
+    step: 0.5
+
+############## 4
+
+  temp_soll_zimmer4:
+    name: zimmer
+    unit_of_measurement: °C
+    icon: mdi:temperature-celsius
+
+    min: 18
+    max: 22
+    step: 0.5
+
+  temp_soll_schlafzimmer4:
+    name: schlafzimmer
+    unit_of_measurement: °C
+    icon: mdi:temperature-celsius
+
+    min: 18
+    max: 22
+    step: 0.5
+
+####### AWAY Temperatur    
+  temp_soll_away:
+    name: Away Temperatur
+    unit_of_measurement: °C
+    icon: mdi:temperature-celsius
+
+    min: 18
+    max: 21
+    step: 0.5
+
+
+# TIMER
+
+timer:
+  unten_auf_timer:
+    duration: '00:01:00'
+
+  unten_zu_timer:
+    duration: '00:08:00'

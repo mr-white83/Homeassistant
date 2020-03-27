@@ -1,0 +1,1234 @@
+
+
+- alias: backup
+  id: 8828663kkvsjjxj68
+  trigger:
+    - platform: time_pattern
+      hours: "/4"
+  action:
+    - service: auto_backup.snapshot_full
+      data_template:
+        name: "AutoBackup: {{ now().strftime('%A, %B %-d, %Y') }}"
+        keep_days: 7
+#        exclude:
+#          addons:
+#            - Portainer
+#          folders:
+ #           - Local add-ons
+ #           - share
+
+
+- alias: Bad_heizung_timer2
+  id: 0f6a7e9055634a00820e9asstt5fb4046a6fb
+  trigger:
+    platform: state
+    entity_id: switch.fibaro_system_fgwpe_f_wall_plug_gen5_switch
+    to: 'on'
+  action:
+  - delay: 00:05:00
+  - service: switch.turn_off
+    entity_id: switch.fibaro_system_fgwpe_f_wall_plug_gen5_switch
+
+
+- alias: luftbefeuchteron
+  id: 0assjb399789fbh66788383777466
+  trigger:
+    platform: time_pattern
+    hours: 10
+    minutes: 30
+    seconds: 0
+  action:
+  - service: switch.turn_on
+    entity_id: switch.stecker1_switch
+- alias: luftbefeuchteroff
+  trigger:
+    platform: time_pattern
+    hours: 16
+    minutes: 15
+    seconds: 0
+  action:
+  - service: switch.turn_off
+    entity_id: switch.stecker1_switch
+  id: 06718879f18d4e46a95147d8174e34f6
+- alias: start_home
+  trigger:
+    platform: time_pattern
+    hours: 6
+    minutes: 1
+    seconds: 0
+  condition:
+    condition: or
+    conditions:
+    - condition: state
+      entity_id: sensor.occupancy_status
+      state: HOME_MODE
+  action:
+  - service: scene.turn_on
+    entity_id: scene.cover30terasse
+  - service: script.openblinds_wohnzimmer
+  - service: script.openblinds_terasse
+  - service: script.set_nest_home
+  
+  
+  
+  id: 80ff13da51984f848dfd7401acb32e4a
+- alias: aufklappen_1
+  trigger:
+  - platform: numeric_state
+    entity_id:  sensor.zamg_sun_last_hour
+    above: '1'
+  condition:
+    condition: and
+    conditions:
+#    - condition: numeric_state
+#      entity_id: sensor.netatmo_aussen_temperature
+#      above: '10'
+#    - condition: state
+#      entity_id: input_select.jahreszeit
+#      state: Winter
+    - condition: state
+      entity_id: sensor.occupancy_status
+      state: AWAY_MODE
+    - condition: numeric_state
+      entity_id:  sensor.zamg_sun_last_hour
+      above: '30'
+    - condition: numeric_state
+      entity_id:  sensor.dark_sky_cloud_coverage
+      below: '60'      
+    - condition: state
+      entity_id: sun.sun
+      state: above_horizon
+# löst nur einmal täglich aus
+    - condition: template
+      value_template: "{{ ( as_timestamp(now()) - as_timestamp(state_attr('automation.aufklappen_1', 'last_triggered')) |int(0) ) > 43200 }}"
+       
+#    - condition: numeric_state
+#      entity_id: sensor.dark_sky_cloud_coverage
+#      below: '30'
+  action:
+#  - service: script.openblinds_wohnzimmer
+#  - service: script.openblinds_terasse
+  - service: script.blinds135_unten
+
+
+  id: 580627c732934a599a84cde165697db7
+- alias: zuklappen_sommer
+  trigger:
+  - platform: numeric_state
+    entity_id: sensor.in_out_temp_diff
+    above: '8'
+  - platform: numeric_state
+    entity_id: sensor.netatmo_aussen_tenperature
+    above: '24' 
+  condition:
+    condition: and
+    conditions:
+    - condition: state
+      entity_id: sun.sun
+      state: above_horizon
+    - condition: numeric_state
+      entity_id: sensor.home_temperature
+      above: '21'
+    - condition: state
+      entity_id: input_select.jahreszeit
+      state: Sommer
+    - condition: state
+      entity_id: sensor.occupancy_status
+      state: AWAY_MODE
+  action:
+  - service: script.jalousiezu
+  
+  
+  id: 8a3aeac7ff6546kjhhgiggiughhna18e6
+- alias: schlafen00
+  trigger:
+    platform: time_pattern
+    hours: 0
+    minutes: 1
+    seconds: 0
+  condition:
+    condition: and
+    conditions:
+    - condition: state
+      entity_id: sensor.occupancy_status
+      state: HOME_MODE
+  action:
+  - service: notify.mobile_app_martiniphone
+    data:
+      message: shutdown in 5 Minuten
+      title: Good Night
+      data:
+        push:
+#          badge: 1
+          category: "GOODNIGHT"
+#  - service: notify.ios_kathrin
+ #   data:
+    #  message: shutdown in 5 Minuten
+  #    title: Good Night
+  #    data:
+   #     push:
+    #      badge: 1
+     #     category: "GOODNIGHT"
+    
+#  - delay: 00:05:00
+#  - delay: 00:02:00
+  - service: script.schlafen00
+
+
+  
+  ##### enter home automations
+  
+  
+  id: yse22883khkjgkugiugiu4995xx
+- alias: enter_home_sun
+  trigger:
+    platform: state
+    entity_id: sensor.occupancy_status
+    to: HOME_MODE
+    for: 
+      minutes: 1
+  condition:
+    condition: and
+    conditions:
+    - condition: state
+      entity_id: sun.sun
+      state: above_horizon
+#    - condition: template
+#      value_template: "{{ ( as_timestamp(now()) - as_timestamp(state_attr('automation.aufklappen_1', 'last_triggered')) |int(0) ) > 43200 }}"      
+  action:
+#  - delay: 00:00:20
+  - service: script.set_nest_home
+  - service: script.openblinds_wohnzimmer
+  - service: script.openblinds_terasse
+#  - service: hue.hue_activate_scene
+#    data:
+#      group_name: Wohnzimmer
+#      scene_name: chilln
+  - service: switch.turn_off
+    entity_id: switch.stecker1_switch
+
+
+
+  id: xfg3bedfafdsstrstra1c0c9
+- alias: enter_home_moon
+  trigger:
+    platform: state
+    entity_id: sensor.occupancy_status
+    to: HOME_MODE
+    for: 
+      minutes: 1
+  condition:
+    condition: and
+    conditions:
+    - condition: state
+      entity_id: sun.sun
+      state: below_horizon
+  action:
+#  - delay: 00:00:20
+  - service: script.set_nest_home
+#  - service: script.openblinds_wohnzimmer
+  - service: script.openblinds_terasse
+  - service: hue.hue_activate_scene
+    data:
+      group_name: Wohnzimmer
+      scene_name: chilln
+  - service: switch.turn_off
+    entity_id: switch.stecker1_switch
+
+  
+  ##### enter home push notify
+  
+  id: m433553bjgfdrsrtdtfea1c0c7 ##### martin
+- alias: enter_home_martin_notify
+  trigger:
+  - platform: state
+    entity_id: device_tracker.martiniphone_2
+    to: home
+    for: 
+      seconds: 40
+  condition:
+    condition: and
+    conditions:  
+    - condition: state
+      entity_id: device_tracker.kathrins_iphone
+      state: not_home      
+  action:
+#  - delay: 00:00:20
+  - service: notify.mobile_app_martiniphone
+    data:
+      message: Es hat {{states.sensor.home_temperature.state}}
+        Grad, 
+      title: Willkommen daheim
+      data:
+        push:
+          badge: 1
+          category: " arrive"
+  
+  
+  id: 9639761049d5446eb7433553bea1c0c8 ### kathi
+- alias: enter_home_kathi_notify
+  trigger:
+  - platform: state
+    entity_id: device_tracker.kathrins_iphone
+    to: home
+    for: 
+      seconds: 40
+  condition:
+    condition: and
+    conditions:  
+    - condition: state
+      entity_id: device_tracker.martiniphone_2
+      state: not_home          
+  action:
+#  - delay: 00:00:20
+  - service: script.set_nest_home
+  - service: notify.ios_kathrin
+    data:
+      message: Licht ein, Kamera aus, Heizung auf comfort, es hat {{states.sensor.home_temperature.state}}
+        Grad
+      title: Willkommen daheim
+      data:
+        push:
+          badge: 1
+          category: "arrive"
+        
+        
+        
+
+  
+  ########## LEAVE
+
+
+
+  
+# notify
+
+
+# wenn fbh ein Zimmer
+  id: 9639881077bnj6eb7433553bea1c0c7 ##### martin
+- alias: fbh_on_notify_zimmer
+  trigger:
+  - platform: state
+    entity_id: switch.fibaro_system_fgs223_double_relay_switch_5
+    to: 'on'
+#    for: 
+#      seconds: 40    
+  action:
+#  - delay: 00:00:20
+  - service: notify.mobile_app_martiniphone
+    data:
+      message: Heizung Zimmer aktiviert. Es hat {{states.sensor.aeon_labs_zw100_multisensor_6_temperature.state}}
+        Grad, 
+      title: Klima
+#      data:
+#        push:
+#          badge: 1
+#          category: " arrive"
+
+# wenn fbh ein Schlafzimmer
+  id: 9639662277bnj6553bea1c0c7 ##### martin
+- alias: fbh_on_notify_sz
+  trigger:
+  - platform: state
+    entity_id: switch.fibaro_system_fgs223_double_relay_switch
+    to: 'on'
+#    for: 
+#      seconds: 40		
+  action:
+  - service: notify.mobile_app_martiniphone
+    data:
+      message: Heizung Schlafzimmer aktiviert. Es hat {{states.sensor.netatmo_base_zimmer_temperature.state}}
+        Grad
+      title: Klima
+#      data:
+#        push:
+#          badge: 1
+#          category: " arrive
+
+
+# wenn fbh ein Wohnzimmer
+  id: 3bea1c0c7 ##### martin
+- alias: fbh_on_notify_wz
+  trigger:
+  - platform: numeric_state
+    entity_id: sensor.tado_unten_heating
+    above: '2'
+
+  action:
+  - service: notify.mobile_app_martiniphone
+    data:
+      message: Heizung Wohnzimmer aktiviert. Es hat {{states.sensor.tado_unten_temperature.state}}
+        Grad
+      title: Klima
+
+
+
+  id: cb162c28fc
+- alias: leave_home_martin_notify
+  trigger:
+    platform: state
+    entity_id: device_tracker.martiniphone_2
+    to: not_home
+  condition:
+    condition: and
+    conditions:
+    - condition: state
+      entity_id: device_tracker.kathrins_iphone
+      state: not_home
+  action:
+  - service: notify.mobile_app_martiniphone
+    data:
+      message: xxxxxxxxxxxxxxxxxx
+      title: Bis später
+
+
+  id: cb01f23b17ef43cb8bcace77162c28fc
+- alias: leave_home_kathi_notify
+  trigger:
+    platform: state
+    entity_id: device_tracker.kathrins_iphone
+    to: not_home
+  condition:
+    condition: and
+    conditions:
+    - condition: state
+      entity_id: device_tracker.martiniphone_2
+      state: not_home
+  action:
+  - service: notify.ios_kathrin
+    data:
+      message: xxxxxxxxxxxxxxx
+      title: Bis später******
+
+# leave automations  
+  id: cb01f22a98ef43cb8bcace77162c28fc
+- alias: leave_home
+  trigger:
+    platform: state
+    entity_id: sensor.occupancy_status
+    to: AWAY_MODE
+  action:
+  - service: script.lichtaus
+  - service: script.stopallmedia
+  - delay: 00:3:00
+  - service: script.jalousiezu
+  - service: script.set_nest_away
+  - delay: 00:03:00
+  - service: automation.trigger
+    entity_id: automation.aufklappen_1
+  - service: automation.trigger
+    entity_id: automation.zuklappen_sommer    
+#  - service: switch.turn_on
+#    entity_id: switch.stecker1_switch
+
+#************ leave ende
+
+# Klima Notify
+
+  id: f1bab0ca8ee244eab0ed8a7caa35de66
+- alias: cool_outside_notify
+  trigger:
+    platform: state
+    entity_id: binary_sensor.cooloutside
+    to: 'on'
+  condition:
+    condition: and
+    conditions:
+    - condition: state
+      entity_id: input_select.jahreszeit
+      state: Sommer
+    - condition: time
+      after: 08:00:00
+      before: '23:30:00'
+    - condition: state
+      entity_id: sensor.occupancy_status
+      state: HOME_MODE
+      
+      ## überarbeiten!!!!!!
+    - condition: numeric_state
+      entity_id: sensor.in_out_temp_diff
+      above: '1'
+  action:
+  - service: notify.mobile_app_martiniphone
+    data_template:
+      title: Lüften
+      message: Draußen ist es kühler als drinnen Temperaturunterschied {{ states.sensor.in_out_temp_diff.state
+        }} Grad
+
+
+
+
+  id: 86bdf6b0cb104c779c8cd3753bae8667
+- alias: cool_inside_notify
+  trigger:
+    platform: state
+    entity_id: binary_sensor.coolinside
+    to: 'on'
+  condition:
+    condition: and
+    conditions:
+    - condition: state
+      entity_id: input_select.jahreszeit
+      state: Sommer
+    - condition: state
+      entity_id: sensor.occupancy_status
+      state: HOME_MODE
+    - condition: time
+      after: 08:00:00
+      before: '23:30:00'
+      
+      ## überarbeiten!!!!!!
+    - condition: numeric_state
+      entity_id: sensor.in_out_temp_diff
+      above: '-1'
+  action:
+  - service: notify.mobile_app_martiniphone
+    data_template:
+      title: Fenster zu
+      message: Draußen ist es wärmer als drinnen. Temperaturunterschied {{ states.sensor.in_out_temp_diff.state
+        }} Grad
+  id: 8fe1519zy92e4d3db67d04bb9c5ab7fa
+- alias: wasserleer
+  trigger:
+    platform: state
+    entity_id: switch.stecker1_switch
+    to: 'on'
+    for: 
+      minutes: 1
+  condition:
+    condition: numeric_state
+    entity_id: sensor.stecker1_power
+    below: '3'
+  action:
+  - service: notify.mobile_app_martiniphone
+    data:
+      message: Luftbefeuchter hat kein Wasser
+
+
+
+  id: 156250628839914581ghjz
+- alias: Regennotify
+  trigger:
+    entity_id: binary_sensor.itsraining
+    platform: state    
+    to: 'on'
+  condition:
+     condition: and
+     conditions:
+#     - condition: state
+#       entity_id: input_select.jahreszeit
+#       state: Sommer
+  action:
+  - service: notify.mobile_app_martiniphone
+    data:
+      message: Niederschlag {{states.sensor.zamg_precipitation.state}} Liter
+      title: Es Regnet !!
+      
+      
+  id: 156292773869113569487581dghjsvzqal
+- alias: probablyrain_notify
+  trigger:
+    - platform: numeric_state
+      entity_id: sensor.dark_sky_precip_prabability
+      above: 29
+  condition: []
+  action:
+  - service: notify.mobile_app_martiniphone
+    data:
+      message: Es wird heute zu {{states.sensor.dark_sky_precip_probability.state}} % regnen!!
+      title: Wetter Vorschau
+
+  id: djkabbdk78729
+- alias: trockennotify
+  trigger:
+  - entity_id: sensor.zamg_precipitation
+    platform: state
+    to: '0.0'
+  action:
+  - service: notify.mobile_app_martiniphone
+    data:
+      message: Es scheint wieder trocken zu sein -- {{states.sensor.zamg_precipitation.state}}
+        Liter Niederschlag
+      title: Wetter 
+      
+  id: djkabbdk78730
+- alias: notify_balkon_auf
+  trigger:
+    platform: state
+    entity_id: sensor.terasse_access_control
+    to: offen
+  condition:
+  - condition: state
+    entity_id: sensor.occupancy_status
+    state: AWAY_MODE
+  action:
+  - service: notify.mobile_app_martiniphone
+    data:
+      message: Balkontür offen
+      title: Sensor Test
+
+  id: djkabbdk78731
+- alias: notify_balkon_auf_2223
+  trigger:
+    platform: state
+    entity_id: sensor.fibaro_system_fgdw002_door_opening_sensor_2_access_control_3
+    to: '23'
+  action:
+  - service: notify.mobile_app_martiniphone
+    data:
+      message: Balkontürsensor state change
+      title: Sensor Test 2223
+
+### iphone actionable automations
+
+  id: c6290e29f9de4ef6b2c735b55893tre
+- alias: coverauf
+  trigger:
+    platform: event
+    event_type: ios.notification_action_fired
+    event_data:
+      actionName: JALOUSIETERASSEAUF
+  action:
+  - service: script.jalousie_terasse_auf
+  
+  id: c6290e29f9de4ef6b2c735b55893rud
+- alias: lichtein1
+  trigger:
+    platform: event
+    event_type: ios.notification_action_fired
+    event_data:
+      actionName: LICHTEIN
+  action:
+  - service: switch.turn_on
+    entity_id: switch.fibaro_system_fgs223_double_relay_switch_5
+  - service: light.turn_on
+    entity_id: light.lampe
+
+### push notification actions
+ # als button für notifications
+ 
+  id: c6290e30bxde4ef6b2c735b55893blaad
+- alias: snooze
+  trigger:
+    platform: event
+    event_type: ios.notification_action_fired
+    event_data:
+      actionName: SNOOZE
+  action:
+  - service: homeassistant.turn_off
+    entity_id: script.schlafen00
+  - delay: 00:15:00
+  - service: homeassistant.turn_on
+    entity_id: script.schlafen00
+  - service: automation.trigger
+    entity_id: automation.schlafen00
+
+  
+  id: c6290e29f9de4ef6b2c735b5639gla
+- alias: blindsup
+  trigger:
+    platform: event
+    event_type: ios.notification_action_fired
+    event_data:
+      actionName: BLINDSUP
+  action:
+  - service: script.openblinds_wohnzimmer
+  - service: script.openblinds_terasse
+
+
+  id: c6290e29f9de4627b2c735b55893blaad
+- alias: stopshutdown
+  trigger:
+    platform: event
+    event_type: ios.notification_action_fired
+    event_data:
+      actionName: STOPSHUTDOWN
+  action:
+  - service: homeassistant.turn_off
+    entity_id: script.schlafen00
+
+#####xxxxxxxxxx ios actions ENDE
+
+
+
+
+###### iOS Actions 
+# watch actions und shortcut action am iphone
+
+
+- alias: "Welcome action"
+  initial_state: true
+  trigger:
+    - platform: event
+      event_type: ios.action_fired
+      event_data:
+        actionName: 'welcome home'
+  action:
+  - service: light.turn_on
+    entity_id: light.lampe
+  - service: script.sonosoe3unten
+
+
+- alias: "jalousie_zu_action"
+  initial_state: true
+  trigger:
+    - platform: event
+      event_type: ios.action_fired
+      event_data:
+        actionName: 'jalousie_wohnzimmer_zu'
+  action:
+    service: script.jalousie_wohnzimmer_zu
+
+###******** ENDE 
+
+#couch licht dimmen wenn tv ton ein
+
+- alias: tvlight_dim
+  trigger:
+    platform: state
+    entity_id: sensor.sonosmode
+    to: 'TV'
+  condition:
+    condition: and
+    conditions:
+    - condition: template
+      value_template: "{{ ( as_timestamp(now()) - as_timestamp(state_attr('automation.tvlight_dim', 'last_triggered')) |int(0) ) > 3600 }}"
+    - condition: state
+      entity_id: media_player.wohnzimmer
+      state: playing
+
+  action:
+  - service: hue.hue_activate_scene
+    data:
+      group_name: TV
+      scene_name: Fernsehn
+
+# Couchlicht ein wenn sonne schon weg
+  
+  id: c6290e29f9de4ef6b2c735b5b1435a3a
+- alias: suncheck
+  trigger:
+    platform: state
+    entity_id: script.fernsehschaun
+    to: 'on'
+  condition:
+  - condition: state
+    entity_id: sun.sun
+    state: below_horizon
+  action:
+  - service: hue.hue_activate_scene
+    data:
+      group_name: Wohnzimmer
+      scene_name: Fernsehn
+
+###### KLIMA Fußbodenheizung Kontrolle 
+
+  id: 75435b9b85eb42eba6db6b9914926ed3
+- alias: SZ_Fenster_FHB_aus
+  trigger:
+    platform: state
+    entity_id: sensor.fenster_sz_status
+    to: 'offen'
+    for:
+      minutes: 1
+  action:
+  - service: climate.turn_off
+    data:
+      entity_id: climate.schlafzimmer
+#      hvac_mode: 'off'
+  - service: climate.turn_off
+    data:
+      entity_id: climate.zimmer
+#      hvac_mode: 'off'
+  id: b626af518d744556b5103219e0940bcb
+- alias: SZ_Fenster_FHB_ein
+  trigger:
+    platform: state
+    entity_id: sensor.fenster_sz_status
+    to: 'geschlossen'
+    for:
+      minutes: 15
+  condition:
+  - condition: state
+    entity_id: input_select.jahreszeit
+    state: Winter
+  action:
+  - service: climate.turn_on
+    data:
+      entity_id: climate.schlafzimmer
+  - service: climate.turn_on
+    data:
+      entity_id: climate.zimmer      
+#      hvac_mode: 'heat'
+#  - service: climate.turn_on
+#    data:
+#      entity_id: climate.zimmer
+
+      
+      
+  id: c3c3d66fe7574e84926f4c81327684bc
+- alias: temp_zimmer_frueh
+  trigger:
+    platform: time_pattern
+    hours: 5
+    minutes: 30
+    seconds: 0
+  action:
+  - service: climate.set_temperature
+    data_template:
+      entity_id: climate.zimmer
+      temperature: '{{ states(''input_number.temp_soll_zimmer1'') }}'
+  id: ec37b9419b8c4bf59a512babb0b70506
+- alias: temp_schlafzimmer_frueh
+  trigger:
+    platform: time_pattern
+    hours: 5
+    minutes: 30
+    seconds: 0
+  action:
+  - service: climate.set_temperature
+    data_template:
+      entity_id: climate.schlafzimmer
+      temperature: '{{ states(''input_number.temp_soll_schlafzimmer1'') }}'
+  id: 807a90d1764a4a4cb7ae185bc2cbfef0
+- alias: temp_zimmer_tag
+  trigger:
+    platform: time_pattern
+    hours: 7
+    minutes: 30
+    seconds: 0
+  action:
+  - service: climate.set_temperature
+    data_template:
+      entity_id: climate.zimmer
+      temperature: '{{ states(''input_number.temp_soll_zimmer2'') }}'
+  id: 217c540e68894149be8f5b2018593b69
+- alias: temp_schlafzimmer_tag
+  trigger:
+    platform: time_pattern
+    hours: 7
+    minutes: 30
+    seconds: 0
+  action:
+  - service: climate.set_temperature
+    data_template:
+      entity_id: climate.schlafzimmer
+      temperature: '{{ states(''input_number.temp_soll_schlafzimmer2'') }}'
+  id: 7af26337e7254d1a83b6cf0bafffc883
+- alias: temp_zimmer_abend
+  trigger:
+    platform: time_pattern
+    hours: 18
+    minutes: 0
+    seconds: 0
+  action:
+  - service: climate.set_temperature
+    data_template:
+      entity_id: climate.zimmer
+      temperature: '{{ states(''input_number.temp_soll_zimmer3'') }}'
+  id: 7f233bdd20f440169622e0dd50076dbc
+- alias: temp_schlafzimmer_abend
+  trigger:
+    platform: time_pattern
+    hours: 18
+    minutes: 0
+    seconds: 0
+  action:
+  - service: climate.set_temperature
+    data_template:
+      entity_id: climate.schlafzimmer
+      temperature: '{{ states(''input_number.temp_soll_schlafzimmer3'') }}'
+  id: fb1cf5545fd249d7b62c87aaf3b998e3
+- alias: temp_zimmer_nacht
+  trigger:
+    platform: time_pattern
+    hours: 22
+    minutes: 0
+    seconds: 0
+  action:
+  - service: climate.set_temperature
+    data_template:
+      entity_id: climate.zimmer
+      temperature: '{{ states(''input_number.temp_soll_zimmer4'') }}'
+  id: c286edc3b16542228d7d15430f170c2a
+- alias: temp_schlafzimmer_nacht
+  trigger:
+    platform: time_pattern
+    hours: 22
+    minutes: 0
+    seconds: 0
+  action:
+  - service: climate.set_temperature
+    data_template:
+      entity_id: climate.schlafzimmer
+      temperature: '{{ states(''input_number.temp_soll_schlafzimmer4'') }}'
+  id: 10f02c54afb543e59645ff5e350550bb
+- alias: FBH_aus_away
+  trigger:
+    platform: state
+    entity_id: sensor.tado_unten_tado_mode
+    to: AWAY
+  action:
+  - service: script.fbh_away
+#  - service: notify.mobile_app_martiniphone
+#    data:
+#      message: Heizung auf Away Mode
+
+
+
+  id: cc5e8e2e66f746b0bdd421c5f59b418c
+- alias: FBH_ein_home
+  trigger:
+    platform: state
+    entity_id: sensor.tado_unten_tado_mode
+    to: HOME
+  action:
+  - service: script.fbh_home
+#  - service: notify.mobile_app_martiniphone
+#    data:
+#      message: Heizung auf Home Mode
+
+
+
+
+# Heizung Wohnzimmer aus wenn Balkontüre oder Wohnzimmer Türe auf
+
+# timer setzen wenn beide türen unten zu
+
+
+  id: deacfa7e058
+- alias: unten_zu_timer_start
+  trigger:
+  - platform: state
+    entity_id: sensor.fibaro_system_fgdw002_door_opening_sensor_2_access_control_2
+    to: '23'
+  - platform: state
+    entity_id: binary_sensor.doorsensor
+    to: 'off'
+  condition:
+    condition: and
+    conditions:
+    - condition: state
+      entity_id: input_select.jahreszeit
+      state: Winter
+    - condition: state
+      entity_id: sensor.fibaro_system_fgdw002_door_opening_sensor_2_access_control_2
+      state: '23'
+    - condition: state
+      entity_id: binary_sensor.doorsensor
+      state: 'off'
+    - condition: state
+      entity_id: climate.tado_unten
+      state: 'off'
+  action:
+  - service: timer.cancel
+    entity_id: timer.unten_auf_timer
+  - service: timer.cancel
+    entity_id: timer.unten_zu_timer
+  - service: timer.start
+    entity_id: timer.unten_zu_timer
+
+
+
+# timer reset wenn türen weniger als 1 Minute offen (kein ausschalten der Heizung)
+
+  id: kkdflllsjjg9948
+- alias: unten_zu_timer_cancel
+  trigger:
+  - platform: state
+    entity_id: sensor.fibaro_system_fgdw002_door_opening_sensor_2_access_control_2
+    to: '23'
+  - platform: state
+    entity_id: binary_sensor.doorsensor
+    to: 'off'
+  action:
+  - service: timer.cancel
+    entity_id: timer.unten_auf_timer
+
+# heizung einschalten wenn timer abgelaufen
+
+  id: yyppqjfldgmmfjd99323jk
+- alias: unten_zu_timer_finished_heizung_ein
+  trigger:
+    platform: event
+    event_type: timer.finished
+    event_data:
+      entity_id: timer.unten_zu_timer
+  action:
+  - service: climate.set_hvac_mode
+    data:
+      entity_id: climate.tado_unten
+      hvac_mode: "auto"
+
+
+# Heizung aus wenn timer abgelaufen
+      
+  id: yyppqqj838438
+- alias: unten_auf_timer_finished_heizung_aus
+  trigger:
+    platform: event
+    event_type: timer.finished
+    event_data:
+      entity_id: timer.unten_auf_timer
+  action:
+  - service: climate.set_hvac_mode
+    data:
+      entity_id: climate.tado_unten
+      hvac_mode: "off"
+  - service: timer.cancel
+    entity_id: timer.unten_zu_timer
+
+
+# Timer setzen wenn einer der Türen aufgemacht werden
+
+  id: pcfa7e058
+- alias: unten_auf_timer_start
+  trigger:
+  - platform: state
+    entity_id: sensor.fibaro_system_fgdw002_door_opening_sensor_2_access_control_2
+    to: '22'
+  - platform: state
+    entity_id: binary_sensor.doorsensor
+    to: 'on'
+  condition:
+    condition: and
+    conditions:
+    - condition: state
+      entity_id: input_select.jahreszeit
+      state: Winter
+    - condition: state
+      entity_id: sensor.fibaro_system_fgdw002_door_opening_sensor_2_access_control_2
+      state: '22'
+    - condition: state
+      entity_id: binary_sensor.doorsensor
+      state: 'on'
+      entity_id: input_select.jahreszeit
+      state: Winter
+    - condition: state
+      entity_id: timer.unten_auf_timer
+      state: 'idle'
+  action:
+  - service: timer.cancel
+    entity_id: timer.unten_auf_timer
+  - service: timer.start
+    entity_id: timer.unten_auf_timer
+
+
+
+#*************************************** Heizung Ende *********************************
+
+
+
+  id: 60875386e46744a883ac5b12b5990491
+- alias: remotekueche1
+  trigger:
+    platform: state
+    entity_id: sensor.up
+    to: 1_click
+  action:
+  - service: switch.turn_on
+    entity_id: switch.fibaro_system_fgs223_double_relay_switch_6
+  id: b166d1b693f140dbb2a8cbad3b0eddf4
+- alias: remotekueche2
+  trigger:
+    platform: state
+    entity_id: sensor.up
+    to: 2_click
+  action:
+  - service: switch.turn_on
+    entity_id: switch.fibaro_system_fgs223_double_relay_switch_6
+  - service: light.turn_on
+    entity_id: light.lampe
+  id: 711a4d538d0044a8908e4e649a4a4d36
+- alias: remotekueche3
+  trigger:
+    platform: state
+    entity_id: sensor.up
+    to: 3_click
+  action:
+  - service: switch.turn_on
+    entity_id: switch.fibaro_system_fgs223_double_relay_switch_6
+  - service: switch.turn_on
+    entity_id: switch.fibaro_system_fgs223_double_relay_switch_5
+  - service: light.turn_on
+    entity_id: light.lampe
+  - service: light.turn_on
+    entity_id: light.tv_backlight
+  id: 5eb2847debab4521bd03778f4d1c6a21
+- alias: remotekueche4
+  trigger:
+    platform: state
+    entity_id: sensor.up
+    to: 4_click
+  action:
+  - service: switch.turn_off
+    entity_id: switch.fibaro_system_fgs223_double_relay_switch_6
+  - service: switch.turn_off
+    entity_id: switch.fibaro_system_fgs223_double_relay_switch_5
+  - service: light.turn_off
+    entity_id: light.lampe
+  - service: light.turn_off
+    entity_id: light.tv_backlight
+    
+########## Katzenklo counting
+  id: 60875386e467455992cjj5b12b5990491
+- alias: Set Downstairs Litter Box Sensor To Zero On Start
+  trigger:
+    platform: homeassistant
+    event: start
+  action:
+  - service: python_script.dlitter_reset
+  id: 6087222995037586hhhfffjj5b12b5990491
+- alias: Count visits to downstairs litter box
+  trigger:
+  - platform: state
+    entity_id: binary_sensor.fibaro_system_fgms001_zw5_motion_sensor_sensor
+    to: 'on'
+  condition:
+  - condition: template
+    value_template: "{% if states.automation.count_visits_to_downstairs_litter_box.last_triggered\
+      \ is not none %}\n  {% if as_timestamp(now()) | int   -  as_timestamp(states.automation.count_visits_to_downstairs_litter_box.attributes.last_triggered)\
+      \ | int > 60 %} true {% else %} false\n  {% endif %}\n{% else %} false {% endif\
+      \ %}\n"
+  action:
+  - service: python_script.dlitter_counter
+  - service: ifttt.trigger
+    data:
+      event: litterbox
+      value1: cat_detected
+  id: 60875386e239957748ggjjdaab12b5990491
+- alias: litter_notify_martin
+  trigger:
+  - platform: numeric_state
+    entity_id: sensor.downstairs_litter_box_visits
+    above: '3'
+  - platform: state
+    entity_id: sensor.occupancy_status
+    to: HOME_MODE
+    for:
+      minutes: 10
+  condition:
+    condition: and
+    conditions:
+    - condition: time
+      after: 07:00:00
+      before: '23:00:00'
+    - condition: state
+      entity_id: sensor.occupancy_status
+      state: HOME_MODE
+    - condition: numeric_state
+      entity_id: sensor.downstairs_litter_box_visits
+      above: '2'
+  action:
+  - service: notify.mobile_app_martiniphone
+    data:
+      title: Time to clean!
+      message: Katzen Klo mehr als 3x benützt
+#  - service: notify.ios_kathrin
+#    data:
+#      title: Time to clean!
+#      message: Katzen Klo mehr als 3x benützt
+  id: 608752008d7gg55992cjj5b12b5990491
+- alias: Reset downstairs litter box visit counter
+  trigger:
+  - platform: state
+    entity_id: binary_sensor.white2
+  action:
+  - service: python_script.dlitter_reset
+# test
+
+- alias: 'Button1click'
+  initial_state: true
+  trigger:
+    - platform: event
+      event_type: zwave.scene_activated
+      event_data:
+        entity_id: zwave.fibaro_system_fgpb101_button
+        scene_id: 1
+        scene_data: 7680
+  action:
+  - service: script.sonosoe3oben
+  
+  
+- alias: 'Button2click'
+  initial_state: true
+  trigger:
+    - platform: event
+      event_type: zwave.scene_activated
+      event_data:
+        entity_id: zwave.fibaro_system_fgpb101_button
+        scene_id: 1
+        scene_data: 7860
+  action:
+  - service: script.sonosoe3unten
+  
+  id: 2994jjslfjjja6778
+- alias: Energy_reset_monthly
+  trigger:
+    platform: time_pattern
+    hours: 0
+    minutes: 0
+    seconds: 0
+  condition:
+    condition: template
+    value_template: "{{ now().date().day == 1 }}"
+  action:
+    - service: zwave.reset_node_meters
+      data: {"node_id":13,"instance":1}
+    - service: zwave.reset_node_meters
+      data: {"node_id":13,"instance":2}
+    - service: zwave.reset_node_meters
+      data: {"node_id":21,"instance":1}
+
+
+  id: wwkxx27
+- alias: Set Theme
+  initial_state: true
+  trigger:
+
+  - platform: homeassistant
+    event: start
+
+  - platform: state
+    entity_id: sun.sun
+    to: above_horizon
+
+  - platform: state
+    entity_id: sun.sun
+    to: below_horizon
+
+  action:
+    service: frontend.set_theme
+    data_template:
+      name: >
+        {% if states('sun.sun') == "above_horizon" %}
+          material_dark_theme_custom
+        {% else %}
+          material_dark_theme_custom
+        {% endif %}
+
+
+- alias: 'walli2upclick'
+  initial_state: true
+  trigger:
+    - platform: event
+      event_type: zwave.scene_activated
+      event_data:
+        entity_id: zwave.fibaro_system_fgwr111_walli_roller_shutter
+        scene_id: 1
+        scene_data: 7860
+  action:
+  - service: script.openblindsunten
+
+
+- alias: 'walli2downclick'
+  initial_state: true
+  trigger:
+    - platform: event
+      event_type: zwave.scene_activated
+      event_data:
+        entity_id: zwave.fibaro_system_fgwr111_walli_roller_shutter
+        scene_id: 2
+        scene_data: 7680
+  action:
+  - service: script.closeblindsunten  

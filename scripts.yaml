@@ -1,0 +1,435 @@
+test:
+  sequence:
+  - service: notify.mobile_app_martiniphone
+    data:
+      message: notify.mobile_app_ONLY
+      title: Test
+gotobed:
+  sequence:
+  - service: hue.hue_activate_scene
+    data:
+      group_name: Wohnzimmer
+      scene_name: Fernsehn
+  - delay: 00:00:06
+  - service: script.stopallmedia
+  - service: light.turn_on
+    data:
+      entity_id: light.stiegenhaus
+  - service: hue.hue_activate_scene
+    data:
+      group_name: Schlafzimmer
+      scene_name: gedimmt
+  - delay: 00:00:30
+  - service: script.lichtausunten
+  - delay: 00:00:20
+  - service: script.lichtausoben
+schlafen00:
+  sequence:
+  - delay: 00:05:00
+  - service: script.lichtaus
+  - service: script.jalousiezu
+  - service: script.stopallmedia
+  - service: script.set_nest_away
+  - service: switch.turn_off
+    data:
+      entity_id: group.lichter
+shutdownhome:
+  sequence:
+  - service: media_player.media_pause
+    data:
+      entity_id: media_player.oben
+  - service: media_player.media_pause
+    data:
+      entity_id: media_player.wohnzimmer
+  - delay: 00:00:05
+  - service: light.turn_off
+    data:
+      entity_id: group.all_lights
+  - service: switch.turn_off
+    data:
+      entity_id: switch.fibaro_system_fgs223_double_relay_switch_5
+  - service: switch.turn_off
+    data:
+      entity_id: switch.fibaro_system_fgs223_double_relay_switch_6
+shutdownup:
+  sequence:
+  - service: light.turn_off
+    data:
+      entity_id: light.schlafzimmer
+  - service: light.turn_off
+    data:
+      entity_id: light.bett
+  - service: media_player.media_pause
+    data:
+      entity_id: media_player.oben
+shutdownunten:
+  sequence:
+  - service: light.turn_off
+    data:
+      entity_id: light.lampe
+  - service: light.turn_off
+    data:
+      entity_id: light.tv_backlight
+  - service: light.turn_off
+    data:
+      entity_id: light.ecklampe
+  - service: media_player.media_pause
+    data:
+      entity_id: media_player.wohnzimmer
+  - service: switch.turn_off
+    data:
+      entity_id: switch.fibaro_system_fgs223_double_relay_switch_5
+  - service: switch.turn_off
+    data:
+      entity_id: switch.fibaro_system_fgs223_double_relay_switch_6
+stopallmedia:
+  sequence:
+  - service: media_player.media_pause
+    data:
+      entity_id: media_player.oben
+  - service: media_player.media_pause
+    data:
+      entity_id: media_player.wohnzimmer
+stopmediaoben:
+  sequence:
+  - service: media_player.media_pause
+    data:
+      entity_id: media_player.oben
+stopmediaunten:
+  sequence:
+  - service: media_player.media_pause
+    data:
+      entity_id: media_player.wohnzimmer
+tvaus:
+  sequence:
+  - service: hdmi_cec.standby
+tvein:
+  sequence:
+  - service: hdmi_cec.power_on
+set_nest_away:
+  sequence:
+  - service: nest.set_away_mode
+    data:
+      away_mode: away
+set_nest_home:
+  sequence:
+  - service: nest.set_away_mode
+    data:
+      away_mode: home
+sonosoe3oben:
+  sequence:
+  - service: media_player.volume_set
+    data:
+      entity_id: media_player.oben
+      volume_level: 0.27
+  - service: media_player.select_source
+    data:
+      entity_id: media_player.oben
+      source: OE3 Hitradio 99.9 (Top 40/Pop)
+sonosfm4oben:
+  sequence:
+  - service: media_player.volume_set
+    data:
+      entity_id: media_player.oben
+      volume_level: 0.25
+  - service: media_player.select_source
+    data:
+      entity_id: media_player.oben
+      source: ORF FM 4 103.8 (Alternative Rock)
+duschen:
+  sequence:
+  - service: media_player.volume_set
+    data:
+      entity_id: media_player.oben
+      volume_level: 0.32
+  - service: media_player.select_source
+    data:
+      entity_id: media_player.oben
+      source: OE3 Hitradio 99.9 (Top 40/Pop)
+  - service: switch.turn_on
+    data:
+      entity_id: switch.fibaro_system_fgwpef_wall_plug_gen5_switch
+sonosoe3unten:
+  sequence:
+  - service: media_player.volume_set
+    data:
+      entity_id: media_player.wohnzimmer
+      volume_level: 0.3
+  - service: media_player.select_source
+    data:
+      entity_id: media_player.wohnzimmer
+      source: OE3 Hitradio 99.9 (Top 40/Pop)
+sonosfm4unten:
+  sequence:
+  - service: media_player.volume_set
+    data:
+      entity_id: media_player.wohnzimmer
+      volume_level: 0.3
+  - service: media_player.select_source
+    data:
+      entity_id: media_player.wohnzimmer
+      source: ORF FM 4 103.8 (Alternative Rock)
+fernsehschaun:
+  sequence:
+  - service: media_player.volume_set
+    data:
+      entity_id: media_player.wohnzimmer
+      volume_level: 0.35
+  - service: media_player.select_source
+    data:
+      entity_id: media_player.wohnzimmer
+      source: TV
+stopcover:
+  sequence:
+  - service: cover.stop_cover
+    entity_id: cover.fibaro_system_fgrm222_roller_shutter_controller_2_level
+  - service: cover.stop_cover
+    entity_id: cover.fibaro_system_unknown_type_1d01_id_1000_level
+jalousiezu:
+  sequence:
+  - service: cover.close_cover
+    entity_id: cover.fibaro_system_fgrm222_roller_shutter_controller_2_level
+  - service: cover.close_cover
+    entity_id: cover.fibaro_system_unknown_type_1d01_id_1000_level
+jalousieauf:
+  sequence:
+  - service: cover.open_cover
+    entity_id: cover.fibaro_system_fgrm222_roller_shutter_controller_2_level
+  - service: cover.open_cover
+    entity_id: cover.fibaro_system_unknown_type_1d01_id_1000_level
+jalousie_terasse_zu:
+  sequence:
+  - service: scene.turn_on
+    entity_id: scene.cover0terasse
+jalousie_terasse_auf:
+  sequence:
+  - service: scene.turn_on
+    entity_id: scene.cover100terasse
+jalousie_wohnzimmer_zu:
+  sequence:
+  - service: scene.turn_on
+    entity_id: scene.cover0wohnzimmer
+jalousie_wohnzimmer_auf:
+  sequence:
+  - service: scene.turn_on
+    entity_id: scene.cover100wohnzimmer
+jalousie1:
+  sequence:
+  - service: scene.turn_on
+    entity_id: scene.cover30wohnzimmer
+  - service: scene.turn_on
+    entity_id: scene.cover30terasse
+openblinds_unten:
+  sequence:
+  - service: script.openblinds_terasse
+  - service: script.openblinds_wohnzimmer
+blinds45_unten:
+  sequence:
+  - service: cover.close_cover
+    entity_id: cover.fibaro_system_fgrm222_roller_shutter_controller_2_level
+  - delay: 00:00:02
+  - service: cover.open_cover
+    entity_id: cover.fibaro_system_fgrm222_roller_shutter_controller_2_level
+  - delay:
+      milliseconds: 120
+  - service: cover.stop_cover
+    entity_id: cover.fibaro_system_fgrm222_roller_shutter_controller_2_level
+  - service: cover.close_cover
+    entity_id: cover.fibaro_system_unknown_type_1d01_id_1000_level
+  - delay: 00:00:02
+  - service: cover.open_cover
+    entity_id: cover.fibaro_system_unknown_type_1d01_id_1000_level
+  - delay:
+      milliseconds: 120
+  - service: cover.stop_cover
+    entity_id: cover.fibaro_system_unknown_type_1d01_id_1000_level
+blinds135_unten:
+  sequence:
+  - service: cover.close_cover
+    entity_id: cover.fibaro_system_fgrm222_roller_shutter_controller_2_level
+  - delay: 00:00:02
+  - service: cover.open_cover
+    entity_id: cover.fibaro_system_fgrm222_roller_shutter_controller_2_level
+  - delay:
+      milliseconds: 1300
+  - service: cover.stop_cover
+    entity_id: cover.fibaro_system_fgrm222_roller_shutter_controller_2_level
+  - service: cover.close_cover
+    entity_id: cover.fibaro_system_unknown_type_1d01_id_1000_level
+  - delay: 00:00:02
+  - service: cover.open_cover
+    entity_id: cover.fibaro_system_unknown_type_1d01_id_1000_level
+  - delay:
+      milliseconds: 1300
+  - service: cover.stop_cover
+    entity_id: cover.fibaro_system_unknown_type_1d01_id_1000_level
+blindsup_unten:
+  sequence:
+  - service: cover.open_cover
+    entity_id: cover.fibaro_system_fgrm222_roller_shutter_controller_2_level
+  - delay:
+      milliseconds: 300
+  - service: cover.stop_cover
+    entity_id: cover.fibaro_system_fgrm222_roller_shutter_controller_2_level
+  - service: cover.open_cover
+    entity_id: cover.fibaro_system_unknown_type_1d01_id_1000_level
+  - delay:
+      milliseconds: 300
+  - service: cover.stop_cover
+    entity_id: cover.fibaro_system_unknown_type_1d01_id_1000_level
+blindsdown_unten:
+  sequence:
+  - service: cover.close_cover
+    entity_id: cover.fibaro_system_fgrm222_roller_shutter_controller_2_level
+  - delay:
+      milliseconds: 300
+  - service: cover.stop_cover
+    entity_id: cover.fibaro_system_fgrm222_roller_shutter_controller_2_level
+  - service: cover.close_cover
+    entity_id: cover.fibaro_system_unknown_type_1d01_id_1000_level
+  - delay:
+      milliseconds: 300
+  - service: cover.stop_cover
+    entity_id: cover.fibaro_system_unknown_type_1d01_id_1000_level
+openblinds_terasse:
+  sequence:
+  - service: cover.close_cover
+    entity_id: cover.fibaro_system_unknown_type_1d01_id_1000_level
+  - delay: 00:00:02
+  - service: cover.open_cover
+    entity_id: cover.fibaro_system_unknown_type_1d01_id_1000_level
+  - delay:
+      milliseconds: 600
+  - service: cover.stop_cover
+    entity_id: cover.fibaro_system_unknown_type_1d01_id_1000_level
+openblinds_wohnzimmer:
+  sequence:
+  - service: cover.close_cover
+    entity_id: cover.fibaro_system_fgrm222_roller_shutter_controller_2_level
+  - delay: 00:00:02
+  - service: cover.open_cover
+    entity_id: cover.fibaro_system_fgrm222_roller_shutter_controller_2_level
+  - delay:
+      milliseconds: 600
+  - service: cover.stop_cover
+    entity_id: cover.fibaro_system_fgrm222_roller_shutter_controller_2_level
+closeblinds_unten:
+  sequence:
+  - service: cover.close_cover
+    entity_id: cover.fibaro_system_fgrm222_roller_shutter_controller_2_level
+  - delay:
+      milliseconds: 1500
+  - service: cover.stop_cover
+    entity_id: cover.fibaro_system_fgrm222_roller_shutter_controller_2_level
+  - service: cover.close_cover
+    entity_id: cover.fibaro_system_unknown_type_1d01_id_1000_level
+  - delay:
+      milliseconds: 1500
+  - service: cover.stop_cover
+    entity_id: cover.fibaro_system_unknown_type_1d01_id_1000_level
+closeblinds_wohnzimmer:
+  sequence:
+  - service: cover.close_cover
+    entity_id: cover.fibaro_system_unknown_type_1d01_id_1000_level
+  - delay:
+      milliseconds: 1500
+  - service: cover.stop_cover
+    entity_id: cover.fibaro_system_unknown_type_1d01_id_1000_level
+closeblinds_terasse:
+  sequence:
+  - service: cover.close_cover
+    entity_id: cover.fibaro_system_fgrm222_roller_shutter_controller_2_level
+  - delay:
+      milliseconds: 1500
+  - service: cover.stop_cover
+    entity_id: cover.fibaro_system_fgrm222_roller_shutter_controller_2_level
+nighttheme:
+  sequence:
+  - service: frontend.set_theme
+    data:
+      name: happynight
+fbh_ein:
+  sequence:
+  - service: climate.set_hvac_mode
+    data:
+      entity_id: climate.schlafzimmer
+      hvac_mode: heat
+  - service: climate.set_hvac_mode
+    data:
+      entity_id: climate.zimmer
+      hvac_mode: heat
+fbh_aus:
+  sequence:
+  - service: climate.set_hvac_mode
+    data:
+      entity_id: climate.schlafzimmer
+      hvac_mode: 'off'
+  - service: climate.set_hvac_mode
+    data:
+      entity_id: climate.zimmer
+      hvac_mode: 'off'
+fbh_away:
+  sequence:
+  - service: climate.set_preset_mode
+    data:
+      entity_id: climate.schlafzimmer
+      preset_mode: away
+  - service: climate.set_preset_mode
+    data:
+      entity_id: climate.zimmer
+      preset_mode: away
+fbh_home:
+  sequence:
+  - service: climate.set_preset_mode
+    data:
+      entity_id: climate.schlafzimmer
+      preset_mode: none
+  - service: climate.set_preset_mode
+    data:
+      entity_id: climate.zimmer
+      preset_mode: none
+fernsehlicht:
+  sequence:
+  - service: hue.hue_activate_scene
+    data:
+      group_name: Wohnzimmer
+      scene_name: Fernsehn
+lichtaus:
+  sequence:
+  - service: switch.turn_off
+    entity_id: switch.fibaro_system_fgs223_double_relay_switch_6
+  - service: switch.turn_off
+    entity_id: switch.fibaro_system_fgs223_double_relay_switch_5
+  - service: switch.turn_off
+    entity_id: switch.fibaro_system_fgs223_double_relay_switch_5_2
+  - service: light.turn_off
+    entity_id: group.all_lights
+lichtausunten:
+  sequence:
+  - service: switch.turn_off
+    data:
+      entity_id: switch.fibaro_system_fgs223_double_relay_switch_6
+lichtausoben:
+  sequence:
+  - service: switch.turn_off
+    entity_id: group.lichteroben
+  - service: light.turn_off
+    entity_id: group.lichteroben
+litter_reset:
+  sequence:
+  - service: automation.trigger
+    data:
+      entity_id: automation.Reset_downstairs_litter_box_visit_counter
+steam:
+  sequence:
+  - service: python_script.dlitter_reset
+    data:
+      addon: core_rpc_shutdown
+      input: steam
+'1585088991373':
+  alias: New Script
+  sequence:
+  - device_id: ff8559cef83a424c925e4055adcaec01
+    domain: cover
+    entity_id: cover.fibaro_system_fgrm222_roller_shutter_controller_2_level
+    type: set_position

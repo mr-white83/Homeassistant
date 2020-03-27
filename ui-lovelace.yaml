@@ -1,0 +1,1781 @@
+##############
+# Resources
+##############
+
+resources:
+
+
+  - url: /community_plugin/cover-element/cover-element-bundle.js
+    type: module    
+
+  - url: /community_plugin/text-divider-row/text-divider-row.js
+    type: module    
+
+  - url: /hacsfiles/lovelace-fold-entity-row/fold-entity-row.js
+    type: module
+
+  - url: /hacsfiles/mini-media-player/mini-media-player-bundle.js
+    type: module
+
+  - url: /local/slider-entity-row.js
+    type: module
+
+
+  - url: /hacsfiles/button-entity-row/button-entity-row.js
+    type: module
+
+
+  - url: /community/button-entity-row/button-entity-row.js
+    type: module
+
+
+  - url: /community/text-element/text-element.js?v=0
+    type: js
+
+  - url: /community/config-template-card.js
+    type: module
+
+
+
+swipe_nav:
+  wrap: false
+  animate: swipe
+#  skip_tabs: 5,6,7,8
+  prevent_default: true
+  swipe_amount: 30
+  
+
+
+name: Home
+views:
+
+
+  - id: blur344halim  # Automatically created id
+    title: testing
+    icon: mdi:home
+    cards:
+
+
+# 1. Reihe
+
+
+      - id: 92394aab93464469ac4cecb5bb3ca10045444  # Automatically created id
+        type: horizontal-stack
+        title: LICHT
+
+        cards:
+
+
+
+
+
+    #   Küche
+            - type: entity-button
+              entity: switch.fibaro_system_fgs223_double_relay_switch_6
+              icon: mdi:lightbulb
+              color: rgb(28, 128, 199)
+              name: Kochen
+    #   Essen
+            - type: entity-button
+              entity: switch.fibaro_system_fgs223_double_relay_switch_4
+              icon: mdi:lightbulb
+              color: rgb(28, 128, 199)
+              name: Essen
+
+    #   Couchlicht
+            - type: entity-button
+              entity: scene.wohnen
+              icon: mdi:lightbulb-group
+              color: rgb(28, 128, 199)
+              name: Wohnen
+              tap_action:
+                action: call-service
+                service: scene.turn_on
+                service_data:
+                  entity_id: scene.wohnen
+
+# 2. *****************************************************
+
+                
+                
+###### Lichtschalter nur einblenden wenn jemand daheim
+
+
+      - id: 25d407101d3e4ceaa7166c8851b223d3  # Automatically created id
+        type: conditional
+        conditions:
+          - entity: sensor.occupancy_status
+            state: HOME_MODE
+
+
+
+# 3. Block - Licht   *****************************************************
+        card:
+          type: horizontal-stack
+          cards:
+
+             - type: entities
+    #           title: LICHT
+               show_header_toggle: false
+               entities:
+                 - type: custom:fold-entity-row
+                   head:
+                     type: section
+                     label: mehr...
+                   open: false
+                   group_config:
+                     secondary_info: last-changed
+                   items:
+                     - light.lampe
+                     - light.turntables
+                     - light.tv_backlight
+                     - switch.fibaro_system_fgs223_double_relay_switch_4
+                     - switch.fibaro_system_fgs223_double_relay_switch_6     
+                     - media_player.wohnzimmer
+
+# 4. Block - Multimedia *****************************************************
+
+
+      - id: 92245aab14074469ac4cecb5bb3ca100  # Automatically created id
+        type: horizontal-stack
+        title: Multimedia
+        cards:
+                
+#   Ö3 Bad
+          - type: entity-button
+            entity: script.sonosoe3oben
+            icon: mdi:speaker
+            color: rgb(28, 128, 199)
+            name: Ö3 Bad
+            tap_action:
+              action: call-service
+              service: script.turn_on
+              service_data:
+                entity_id: script.sonosoe3oben
+#   Ö3 unten
+          - type: entity-button
+            entity: script.sonosoe3unten
+            icon: mdi:speaker
+            color: rgb(28, 128, 199)
+            name: Ö3 unten
+            tap_action:
+              action: call-service
+              service: script.turn_on
+              service_data:
+                entity_id: script.sonosoe3unten
+
+      - id: 92245aab14074469ac4cecb5bb3ca100  # Automatically created id
+        type: horizontal-stack
+#        title:
+        cards:
+                
+
+#   Ton auf TV schalten
+          - type: entity-button
+            entity: script.fernsehschaun
+            icon: mdi:television
+            color: rgb(28, 128, 199)
+            name: TV-Scene
+            tap_action:
+              action: call-service
+              service: scene.turn_on
+              service_data:
+                entity_id: scene.fernsehn
+              service: scene.turn_on
+              service_data:
+                entity_id: scene.fernsehlicht
+#   MUTE
+          - type: entity-button
+            entity: script.stopallmedia
+            icon: mdi:power
+            color: rgb(28, 128, 199)
+            name: MUTE
+            tap_action:
+              action: call-service
+              service: script.turn_on
+              service_data:
+                entity_id: script.stopallmedia    
+
+
+
+
+      - id: boirokg92245aab140uu100  # Automatically created id
+        type: vertical-stack
+#        title: Multimedia
+        cards:
+
+# Mini Media Player
+         - id: 1562113ed87c469eb21334bfcba54295fbbc  # Automatically created id
+           type: custom:mini-media-player
+           entity: media_player.wohnzimmer
+           icon: mdi:cast
+           artwork_border: true
+           power_color: true
+           show_source: true
+           max_volume: 70        
+           artwork: cover
+
+         - id: 561b75ffb2024e7984agfnnhhgggb10e9ed264337b  # Automatically created id
+           type: custom:mini-media-player
+           entity: media_player.oben
+           icon: mdi:cast
+           artwork_border: true
+           power_color: true
+           show_source: true
+           max_volume: 70        
+           artwork: cover
+
+
+
+         
+# ende Buttons *****************************************************
+
+# Lichter
+
+########################
+################### Jalousien 
+########################
+
+
+
+########################
+##### Jalousien Shortcuts
+########################
+      - id: 9239bnuuujca10045444  # Automatically created id
+        type: horizontal-stack
+        title: Jalousien
+        cards:
+
+#   Sonne rein
+          - type: entity-button
+            entity: script.openblinds_unten
+            icon: mdi:weather-sunny
+            color: rgb(28, 128, 199)
+            name: Sonne rein
+            tap_action:
+              action: call-service
+              service: script.turn_on
+              service_data:
+                entity_id: script.openblinds_unten
+
+
+      - id: 299  # Automatically created id
+        type: horizontal-stack
+
+# 2. Reihe
+
+        cards:
+
+#   AUF
+          - type: entity-button
+            entity: script.jalousieauf
+            icon: mdi:arrow-up
+            color: rgb(28, 128, 199)
+            tap_action:
+              action: call-service
+              service: script.turn_on
+              service_data:
+                entity_id: script.jalousieauf
+
+#   Stop
+          - type: entity-button
+            entity: script.stopcover
+            name: STOP
+            icon: mdi:stop
+            color: rgb(28, 128, 199)
+            tap_action:
+              action: call-service
+              service: script.turn_on
+              service_data:
+                entity_id: script.stopcover
+
+
+
+#   ZU
+          - type: entity-button
+            entity: script.jalousiezu
+            icon: mdi:arrow-down
+            color: rgb(28, 128, 199)
+            tap_action:
+              action: call-service
+              service: script.turn_on
+              service_data:
+                entity_id: script.jalousiezu
+
+      - id: a10045444  # Automatically created id
+        type: horizontal-stack
+#        title: 4.
+        cards:
+
+         - type: entities
+#           title: JALOUSIEN
+           show_header_toggle: false
+           entities:
+             - type: custom:fold-entity-row
+               head:
+                 type: section
+                 label: mehr...
+               open: false
+               group_config:
+                 secondary_info: last-changed
+               items:
+                 - cover.fibaro_system_unknown_type_1d01_id_1000_level #wohnzimmer
+                 - cover.fibaro_system_fgrm222_roller_shutter_controller_2_level #terrasse
+
+
+# 
+
+################################################################################
+######################################  KLIMA  #################################
+################################################################################
+
+
+
+  - id: 3  # Automatically created id
+    title: Klima
+    icon: mdi:home-thermometer
+    cards:
+
+      - id: 188jdkckks713 # Automatically created id
+        type: horizontal-stack
+        cards:
+# # Aktuelle Werte Gauge Cards
+
+          - type: gauge
+            title: Outside Temp
+            entity: sensor.netatmo_base_outdoor_temperature
+            min: -10
+            max: 40
+            severity:
+              green: 10
+              yellow: 20
+              red: 30
+        
+          - type: gauge
+            title: diff
+            name: diff
+            entity: sensor.in_out_temp_diff
+            min: -30
+            max: 40
+            severity:
+              green: 5
+              yellow: 0
+              red: 10
+                            
+          - type: gauge
+            title: Temp innen
+            entity: sensor.tado_unten_temperature
+            min: 18
+            max: 30
+            severity:
+              red: 25
+              green: 20
+              yellow: 23
+              
+                    
+      - id: 205 # Automatically created id
+        type: vertical-stack            
+        cards:    
+###################################### Heizzonen   ####################################
+
+          
+# Tado Wohnzimmer  read only        
+          
+        - type: 'custom:text-divider-row'
+          text: Unten
+
+
+
+
+# Anzeige wenn heizung wegen fenster deaktiviert, wenn heizung aus, jemand daheim, winter saison, beide türen unten zu.
+
+        - type: conditional
+          conditions:
+           - entity: climate.tado_unten
+             state: 'off'
+           - entity: sensor.occupancy_status
+             state: HOME_MODE
+           - entity: input_select.jahreszeit
+             state: Winter
+
+             
+          card:
+            type: picture-elements
+            image: /local/pics/window_open.jpg
+            panel: true
+#            title: Modus
+            style:
+#              color: rgb(0000, 0000, 0000)
+              size: 100%
+#              height: 20px
+#              width: 60px            
+            elements:
+            - type: custom:text-element
+              text: "Fenster offen Heizung deaktiviert"
+              style:
+                top: 50%
+                left: 50%
+                color: rgb(000, 000, 000)
+                font-size: 200%
+#************************ Timer anzeigen wenn aktiv:
+        - type: conditional
+#          title: heizung aus
+          conditions:
+           - entity: timer.unten_zu_timer
+             state: 'active'
+          card:
+            type: entities
+            entities:
+              - entity: timer.unten_zu_timer
+                name: "Fenster zu 
+                Heizung wieder ein in"
+
+        - type: conditional
+          conditions:
+           - entity: timer.unten_auf_timer
+             state: 'active'
+          card:
+            type: entities
+            entities:
+              - entity: timer.unten_auf_timer
+                name: Heizung wird deaktiviert in
+                
+#************* Timer Ende
+#************** Conditional ENDE
+
+
+        - type: thermostat
+          #title: Wohnzimmer
+          entity: climate.tado_unten
+          
+                    
+        - type: entities
+#          title: Wohnzimmer
+          show_header_toggle: false
+          entities:
+            - entity: sensor.tado_unten_humidity
+            - entity: sensor.wohnzimmerfenster
+              name: Wohnzimmerfenster
+              secondary_info: last-changed
+#            - entity: timer.tado_aus_balkontuer_triggered
+            - entity: sensor.balkontuer
+              name: Balkontür
+              secondary_info: last-changed
+
+
+
+
+
+# Zimmer
+
+        - type: 'custom:text-divider-row'
+          text: Zimmer
+
+        - type: thermostat
+#          title: Zimmer
+          entity: climate.zimmer
+
+        - type: entities
+#          title: Zimmer
+          show_header_toggle: false
+          entities:
+            - entity: sensor.aeon_labs_zw100_multisensor_6_relative_humidity
+            # - sensor.netatmo_base_zimmer_temperature
+            # - sensor.aeon_labs_zw100_multisensor_6_temperature
+            # - sensor.aeon_labs_zw100_multisensor_6_relative_humidity
+            
+# Schlafzimmer
+
+        - type: 'custom:text-divider-row'
+          text: Schlafzimmer
+  
+        - type: thermostat
+          #title: Schlafzimmer
+          entity: climate.schlafzimmer
+        - type: entities
+#          title: Schlafzimmer
+          show_header_toggle: false
+          entities:
+            - entity: sensor.fenster_sz_status
+              name: Schlafzimmer Fenster
+              secondary_info: last-changed
+
+      - id: 188jdkckks713 # Automatically created id
+        type: horizontal-stack
+        cards:
+        
+          - type: gauge
+  #          title: 
+            name: Co2 Schlafzimmer
+            entity: sensor.netatmo_base_zimmer_co2
+            min: 300
+            max: 2500
+            severity:
+              blue: 200
+              green: 500
+              yellow: 800
+              red: 2000
+  
+          - type: gauge
+  #          title: 
+            name: h2o Schlafzimmer
+            entity: sensor.netatmo_base_zimmer_humidity
+            min: 0
+            max: 100
+            severity:
+              blue: 
+              green: 50
+              yellow: 30
+              orange: 20
+
+# Außentemperatur History               
+      # - id: 210  # Automatically created id
+        # type: sensor
+        # entity: sensor.netatmo_base_outdoor_temperature
+        # name: Außentemperatur
+        # height: 75
+        # line_color: '#3498db'
+
+
+
+
+#######################################################
+# Außen Sensoren 
+
+          
+      - type: 'custom:text-divider-row'
+        text: Draußen
+                 
+      - id: 708e77e96055474690333889b049da55  # Automatically created id
+        type: entities
+#        title: Außen
+        show_header_toggle: false
+        entities:
+          - sensor.netatmo_base_outdoor_temperature        
+          - sensor.dark_sky_apparent_temperature          
+          - sensor.netatmo_base_outdoor_humidity
+
+
+# # Wetter
+      # - id: f5a95a1273904eda87fa0b5dc70b1eb3  # Automatically created id
+        # type: weather-forecast
+        # entity: weather.zamg_wetter
+
+      - id: 708e77e96055474690333889b049da5233 # Automatically created id
+        type: entities
+        title: Wetter
+        show_header_toggle: false
+        entities:
+          - sensor.dark_sky_summary
+          - sensor.dark_sky_cloud_coverage
+          - sensor.zamg_sun_last_hour
+          - sensor.zamg_precipitation
+          - sensor.dark_sky_precip_intensity
+          - sensor.dark_sky_precip_probability          
+
+          - sensor.dark_sky_uv_index          
+          - sensor.dark_sky_hourly_summary
+          - sensor.dark_sky_daily_summary
+#          - sensor.downstairs_litter_box_visits
+          # - sensor.dark_sky_sunrise
+          # - sensor.dark_sky_sunset
+#-————————————————————————————        
+        
+
+####################          
+## 
+ #########
+####################
+  - id: 5  # Automatically created id
+    title: Zähler
+    icon: mdi:speedometer
+    cards:
+
+# 1. Reihe
+      - id: 201 # Automatically created id
+        type: horizontal-stack
+        cards:
+# # Aktuelle Werte Gauge Cards
+
+# Bad Heizung
+          - type: gauge
+            title: Licht Küche
+            entity: sensor.fibaro_system_fgs223_double_relay_power_3
+            min: 0
+            max: 15
+            severity:
+              orange: 8
+              green: 0
+              blue: 5
+
+# Power Licht Essen
+
+          - type: gauge
+            title: Licht Essen
+            entity: sensor.fibaro_system_fgs223_double_relay_power_4
+            min: 0
+            max: 15
+            severity:
+              orange: 8
+              green: 0
+              blue: 5
+
+              
+# 1. Reihe
+      - id: 3920 # Automatically created id
+        type: horizontal-stack
+        cards:              
+# Power Küchenlicht
+
+          - type: gauge
+            title: Heizung
+            entity: sensor.fibaro_system_fgs223_double_relay_power_2
+            min: 0
+            max: 15
+            severity:
+              yellow: 10
+              green: 3
+              red: 1
+
+          - type: gauge
+            title: Heizung
+            entity: sensor.fibaro_system_fgs223_double_relay_power_5
+            min: 0
+            max: 15
+            severity:
+              yellow: 10
+              green: 3
+              red: 1
+        
+        
+        
+
+      - id: bd67f526231e493f82172ba7f6e64dbb  # Automatically created id
+        type: entities
+        title: Sensoren
+        show_header_toggle: false
+        entities:
+          - sensor.balkontuer
+          - sensor.fenster_sz_status
+          - sensor.tado_unten_power
+          - sensor.tado_unten_tado_mode
+          - sensor.netatmo_base_outdoor_temperature
+
+
+
+      
+
+          
+     # Zähler          
+      - id: 8dc71194b52a49f6918ee5d2e24c599b  # Automatically created id
+        type: entities
+        title: Zähler
+        show_header_toggle: false
+        entities:
+
+          - sensor.fibaro_system_fgs223_double_relay_energy_3
+          - sensor.fibaro_system_fgs223_double_relay_energy_4
+#          - sensor.fibaro_system_fgwpe_f_wall_plug_gen5_energy
+#          - sensor.stecker1_energy
+#          - sensor.wohnzimmer_energy
+#          - sensor.terasse_energy
+#	          - sensor.stromkosten_summe
+
+          
+
+       
+          
+# aktueller Verbrauch          
+      - id: 8dc71194b52asdfasdb1234f918ee5d2e24c599b  # Automatically created id
+        type: entities
+        title: aktuelle Werte
+        show_header_toggle: false
+        entities:
+#          -  sensor.fibaro_system_fgwpe_f_wall_plug_gen5_power
+          -  sensor.fibaro_system_fgs223_double_relay_power_3
+          -  sensor.fibaro_system_fgs223_double_relay_power_4
+         
+          -  sensor.fibaro_system_fgs223_double_relay_power_5
+          -  switch.fibaro_system_fgs223_double_relay_switch_5
+                
+          -  sensor.fibaro_system_fgs223_double_relay_power_2          
+          -  switch.fibaro_system_fgs223_double_relay_switch
+
+         
+
+
+########################################### History
+  - id: 6  # Automatically created id
+    title: HISTORY
+    icon: mdi:chart-areaspline
+    cards:
+
+                
+# *************************        
+        
+        
+            
+      - id: 51ffe00c5c341232ca720d07c94b0659b  # Automatically created id
+        type: vertical-stack
+        cards:               
+# Klima
+
+          - id: c1927318167f41d2afbf679cad1491f4  # Automatically created id
+            type: history-graph
+            title: Klima 24 Stunden
+            hours_to_show: 24
+            refresh_interval: 60
+            entities:
+              - sensor.tado_unten_temperature
+              - sensor.fibaro_system_fgms001_zw5_motion_sensor_temperature
+              - sensor.aeon_labs_zw100_multisensor_6_temperature          
+              # - sensor.netatmo_base_oben_humidity
+              - sensor.tado_unten_humidity
+              - sensor.netatmo_base_outdoor_temperature
+              - sensor.tado_unten_heating
+              - switch.fibaro_system_fgs223_double_relay_switch
+              - switch.fibaro_system_fgs223_double_relay_switch_2
+              
+          - id: c1927318167f41d2afbf679cad1491f4  # Automatically created id
+            type: history-graph
+            title: Klima 3 Tage
+            hours_to_show: 168
+            refresh_interval: 240
+            entities:
+              - sensor.tado_unten_temperature
+              - sensor.fibaro_system_fgms001_zw5_motion_sensor_temperature
+              - sensor.aeon_labs_zw100_multisensor_6_temperature          
+              - sensor.netatmo_base_oben_humidity
+              - sensor.tado_unten_humidity
+              - sensor.netatmo_base_outdoor_temperature
+              - sensor.tado_unten_heating
+              - switch.fibaro_system_fgs223_double_relay_switch
+              - switch.fibaro_system_fgs223_double_relay_switch_2             
+           
+           
+     
+       
+   # Strom       
+      - id: 09d79fdd931046e19fc64f90b0959741  # Automatically created id
+        type: history-graph
+        title: Strom 24 Stunden
+        hours_to_show: 24
+        refresh_interval: 60
+        entities:
+          - sensor.stecker1_power
+          - sensor.light_kueche_power
+          - sensor.light_kueche_power_2
+          - sensor.fibaro_system_fgrm222_roller_shutter_controller_2_power_2
+          - sensor.stecker1_power
+           
+# Lichter
+      - id: 23312333  # Automatically created id
+        type: history-graph
+        title: Lichter 24 Stunden
+        hours_to_show: 24
+        refresh_interval: 60
+        entities:
+          - light.lampe
+          - light.tv_backlight
+          - switch.fibaro_system_fgs223_double_relay_switch_6
+          - switch.fibaro_system_fgs223_double_relay_switch_5
+          - light.schlafzimmer
+          - light.stiegenhaus
+
+          
+          
+################ Horizontal Stack mit 3 Sensoren nebeneinander
+
+      - id: 51ffe00c5c04442ca720d07c94b0659b  # Automatically created id
+        type: horizontal-stack
+        cards:
+# TEMP Wohnzimmer
+          - type: sensor
+            entity: sensor.tado_unten_temperature
+            graph: line            
+            name: Wohnzimmer
+            hours_to_show: 24
+            line_color: "#3498db"
+      - id: 51ffe43i9c04442ca720d07c94b0659b  # Automatically created id
+        type: horizontal-stack
+        cards:
+# TEMP Schlafzimmer
+          - type: sensor
+            entity: sensor.netatmo_base_zimmer_temperature
+            name: Schlafzimmer
+            graph: line            
+            hours_to_show: 24
+            line_color: "#3498db"
+           
+      - id: 51ffe00c5c08881ca720d07c94b0659b  # Automatically created id
+        type: horizontal-stack
+        cards:
+# TEMP Zimmer
+          - type: sensor
+            entity: sensor.aeon_labs_zw100_multisensor_6_temperature
+            name: Zimmer
+            graph: line
+            hours_to_show: 24
+            line_color: "#3498db"          
+            
+          
+
+#############
+## GPS  #####
+#############         
+  - id: 4  # Automatically created id
+    title: GPS
+    icon: mdi:map-marker
+    cards:
+        
+        
+      - id: 6259a943e6434fe2b798273fd6f91a4a  # Automatically created id
+        type: entity-filter
+        entities:
+          - device_tracker.martiniphone
+          - device_tracker.kathrins_iphone
+
+        state_filter:
+          - home
+
+        card:
+          type: glance
+          title: wer is daheim
+
+
+#      - id: 2851f48d3ed4420c8d90e06b3b3e9e97  # Automatically created id
+#        type: entities
+#        entities:
+#          - device_tracker.kathrins_iphone
+#          - device_tracker.martiniphone
+#          - sensor.tado_unten_eta
+
+
+# Streifen mit Infos
+      - id: dcbfbca0e24a404e9ca1b3240852d391  # Automatically created id
+        type: picture-elements
+        image: /local/pics/window1.jpg
+        title: Status
+        panel: true
+        show_header_toggle: false
+        style:
+          size: 20%
+        elements:
+
+
+# Home Mode/Away Mode
+
+          - type: state-label
+            title: jemand zuhause
+            icon: mdi:home
+
+            entity: sensor.occupancy_status
+            style:
+              top: 25%
+              left: 35%
+              font-size: 250%
+              color: rgb(000, 000, 000)
+
+
+          
+# System Monitor
+  - id: 7 # auto id
+    title: System Monitor
+    icon: mdi:raspberry-pi
+    cards:
+      # - id: 95834bd5d25d44c5927076344e3a44d9  # Automatically created id
+        # type: entities
+        # entities:
+          # - script.nighttheme
+          # - sensor.netatmo_base_outdoor_battery
+          # - sensor.netatmo_base_outdoor_radio
+          
+      - id: 188jdkckks713 # Automatically created id
+        type: horizontal-stack
+        cards:
+# # Aktuelle Werte Gauge Cards
+
+          - type: gauge
+            title: Processor use
+            entity: sensor.processor_use
+            min: 0
+            max: 100
+            severity:
+              orange: 25
+              green: 20
+              blue: 19 
+
+          - type: gauge
+            title: Disk use
+            entity: sensor.disk_use_percent
+            min: 0
+            max: 100
+            severity:
+              orange: 65
+              green: 10
+              blue: 30
+
+            
+      - id: 188jdkjayio6124013 # Automatically created id
+        type: horizontal-stack
+        cards:
+        
+          - type: sensor
+            entity: sensor.memory_use
+            graph: line            
+            name: RAM use
+            hours_to_show: 2
+            line_color: "#3498db"
+
+        
+      - id: 669e2d479cfe41b49bff68047d7918ec  # Automatically created id
+        type: entities
+        title: raspberry
+        show_header_toggle: false
+        entities:
+          - sensor.processor_use
+          - sensor.memory_use
+          - sensor.disk_free
+          - sensor.disk_use_percent
+          - sensor.network_in_eth0
+          - sensor.network_out_eth0
+          # - sensor.since_last_boot
+          - sensor.last_boot
+          
+          
+
+          
+  - id: 8  # Automatically created id
+    title: Automations
+    icon: mdi:mixcloud
+    cards:
+    
+   
+      - id: b0bafea5e0434783b9173197fcf5b8d1  # Automatically created id
+        type: entities
+        title: AI & Security
+        show_header_toggle: false
+        entities:
+          - automation.enter_home_moon
+          - automation.enter_home_sun
+          - automation.leave_home        
+          - automation.schlafen00
+          - automation.start_home
+          - automation.tvlight_dim
+          
+          
+          
+      - id: dd1e176308c64a5598934b69a47adf08  # Automatically created id
+        type: entities
+        title: Klima
+        show_header_toggle: true
+        entities:
+          - automation.balkon_auf_tado_aus
+          - automation.balkon_zu_tado_ein          
+          - automation.fenster_wz_auf_tado_aus
+          - automation.fenster_wz_zu_tado_ein          
+          - automation.sz_fenster_fhb_aus
+          - automation.sz_fenster_fhb_ein
+          - automation.fbh_aus_away
+          - automation.fbh_ein_home
+          - automation.luftbefeuchteron
+          - automation.luftbefeuchteroff
+          - automation.zuklappen_sommer
+          - automation.aufklappen_1
+
+      - id: e16645658a2e42589aff8fcce05c9114  # Automatically created id
+        type: entities
+        title: Benachrichtigungen
+        show_header_toggle: true
+        entities:
+#          - automation.security_balkon
+          - automation.enter_home_martin_notify
+          - automation.enter_home_kathi_notify
+          - automation.leave_home_kathi_notify
+#          - automation.leave_home_martin_notify             
+          - automation.notify_balkon_auf ## muss getrennt werden
+          
+          
+      - id: e05c9114  # Automatically created id
+        type: entities
+        title: Gruppen
+        show_header_toggle: false
+        entities:
+          - group.all_notifications
+          - group.all_automations         
+
+
+
+###############################################
+# Heizung Einstellungen
+###############################################
+  - id: 10  # auto id
+    title: Klima Setup
+    path: setup
+    view: false
+#    icon: mdi:timetable
+
+    cards:
+      - id: 3278dbe3876f4cfdb4670f02fdeb55ea  # Automatically created id
+        type: entities
+        title: in der Früh (06:00 - 08:00)
+        show_header_toggle: false
+        entities:
+          - input_number.temp_soll_zimmer1
+          - input_number.temp_soll_schlafzimmer1
+      - id: 962587118e784479bacff484f70796ac  # Automatically created id
+        type: entities
+        title: Tag (08:00 - 18:00)
+        show_header_toggle: false
+        entities:
+          - input_number.temp_soll_zimmer2
+          - input_number.temp_soll_schlafzimmer2
+      - id: 5ccba0e048724c2296f9022d376cccdb  # Automatically created id
+        type: entities
+        title: Abend (18:00 - 22:00)
+        show_header_toggle: false
+        entities:
+          - input_number.temp_soll_zimmer3
+          - input_number.temp_soll_schlafzimmer3
+      - id: cb1d4a14672e454096d4a02368ff4e6b  # Automatically created id
+        type: entities
+        title: Nacht (22:00 - 06:00)
+        show_header_toggle: false
+        entities:
+          - input_number.temp_soll_zimmer4
+          - input_number.temp_soll_schlafzimmer4
+
+      - id: 4563cce05c9114  # Automatically created id
+        type: entities
+        title: Benachrichtigungen
+        show_header_toggle: true
+        entities:
+          - automation.cool_inside_notify
+          - automation.cool_outside_notify             
+#          - automation.fhb_on_notify_zimmer
+#          - automation.fhb_on_notify_sz
+          - group.climate_notifications
+
+
+      - id: c2344skkhhlllss  # Automatically created id
+        type: entities
+        title: Einstellungen
+        show_header_toggle: false
+        entities:
+          - input_select.jahreszeit
+
+
+############################# Security Panel #################################################################
+
+
+
+  - title: Security
+    icon: mdi:cctv
+    panel: true
+    cards:            
+
+#      - id: kksbj7883h
+#        type: 'custom:home-feed-card'
+#          title: Home Feed
+#          show_empty: false
+#          calendars:
+#            - calendar.home_calendar
+#            - calendar.work_calendar
+ #         id_filter: ^home_feed_.*
+#          entities:
+#              - sensor.next_alarm_time
+#              - entity: sensor.bin_collection
+#                name: Next Bin Collection
+
+
+                
+      - id: 51ffe00c5c04442ca234507c94b0659b  # Automatically created id
+        type: vertical-stack
+        cards:
+
+        
+          - id: 669e2d479cfe429ggbff68047d7918ec  # Automatically created id
+            type: entities
+            title: Katzenklo
+            show_header_toggle: false
+            entities:
+              - entity: binary_sensor.fibaro_system_fgms001_zw5_motion_sensor_sensor
+                name: letzte Bewegung
+                secondary_info: last-changed
+              - entity: sensor.downstairs_litter_box_visits
+                name: Visits seit reset
+#                secondary_info: last-changed 
+
+
+
+
+
+
+                
+   #           - entity: script.litter_reset
+  #              type: 'custom:secondaryinfo-entity-row'           
+    #            name: ____
+      #          secondary_info: "letzter Reset vor:  [[ '(automation.reset_downstairs_litter_box_visit_counter.attributes.last_triggered)' - (timestamp (now)) ]] min."
+                
+                
+                
+                
+      #         - entity: automation.reset_downstairs_litter_box_visit_counter
+        #         type: 'custom:secondaryinfo-entity-row'
+         #        secondary_info: "[[ automation.reset_downstairs_litter_box_visit_counter.attributes.last_triggered ]]"
+
+
+#######################test############
+
+#*************************************************
+
+
+####### weiss net was da los ist die unterhalb haben funktioniert:
+
+
+# # working secondary info mit attribute eines anderen sensors
+# probieren mit format: datetime die ausgabe zu formatieren
+
+
+
+    #           - entity: device_tracker.martiniphone_2
+   #              type: 'custom:secondaryinfo-entity-row'
+   #              secondary_info: "[[ automation.reset_downstairs_litter_box_visit_counter.attributes.last_triggered ]]"
+                 #format: datetime
+
+
+# # working secondary info mit berechnung
+              # - entity: device_tracker.martiniphone_2
+                # type: 'custom:secondaryinfo-entity-row'
+                # secondary_info: "[[ if(device_tracker.martiniphone_2.state == 'Home', null, device_tracker.martiniphone_2.state) ]]"
+
+
+  
+    
+# BUTTONS
+
+          - id: 92394aab1234hhhhhhssdfd469ca100  # Automatically created id
+            type: horizontal-stack
+            cards:
+
+
+#   Litter Reset
+              - type: entity-button
+                entity: script.litter_reset
+                icon: mdi:recycle
+                color: rgb(28, 128, 199)
+                name: Katzenklo GEMACHT
+                tap_action:
+                  action: call-service
+                  service: script.turn_on
+                  service_data:
+                    entity_id: script.litter_reset
+
+                
+          - id: 669e2d479cfe429ggbff691123418ec  # Automatically created id
+            type: entities
+            title: Bewegungsmelder
+            show_header_toggle: false
+            entities:
+              - entity: binary_sensor.aeon_labs_zw100_multisensor_6_sensor
+                name: Bewegung Zimmer
+                secondary_info: last-changed            
+
+#******************************************************   
+    
+# Cameras:
+          - id: 669e2d479cfe429ggbff691123418ec  # Automatically created id
+
+            type: conditional
+            conditions:
+              - entity: camera.daham
+                state: 'recording'
+            card:
+              type: picture-entity
+              entity: camera.daham
+              camera_image: camera.daham
+              tap_action:
+                action: call-service
+                service: camera.snapshot
+                service_data:
+                  entity_id: camera.backdoor
+                  filename: '/shared/backdoor-{{ now().strftime("%Y-%m-%d-%H%M%S") }}.jpg'
+                
+################### Test Area
+
+
+
+
+#          - id: 92394aab188bynnhhssdfd469ca100  # Automatically created id
+          
+   
+          
+#            type: horizontal-stack
+#            cards:
+            
+ 
+
+          - id: 923942288alptuynnhhssdfd469ca100  # Automatically created id                 
+            type: horizontal-stack
+            cards:      
+            - id: jkalf7793
+              type: entities
+              entities:
+              - entity: sensor.tado_unten_temperature
+                type: custom:multiple-entity-row
+                primary:
+                  entity: sensor.netatmo_base_outdoor_temperature
+                secondary:
+                  entity: sensor.tado_unten_temperature
+              - entity: sensor.neratmo_zimmer_temperature
+                type: custom:multiple-entity-row
+                primary:
+                  entity: sensor.netatmo_base_outdoor_temperature
+                secondary:
+                  entity: sensor.tado_unten_temperature            
+             
+                
+          - id: 669e2789slqfe429ggbff691123418ec  # Automatically created id
+            type: entities
+            title: testing
+            show_header_toggle: false
+            entities:
+              - entity: script.lichtaus
+
+
+
+          - type: picture-elements
+            image: /local/background.jpg
+            elements:
+              - type: 'custom:cover-element'
+                entity: cover.fibaro_system_fgrm222_roller_shutter_controller_2_level
+                position_label:
+                  show: true
+                  open_text: open
+                  closed_text: closed
+                  interim_text: open
+                style:
+                  top: 40%
+                  height: 15%
+                  background-color: 'rgba(255, 255, 255, 0.6)'
+                  width: 23%
+                  border-radius: 10px
+                  left: 53%
+
+
+###############################################
+# unten
+###############################################
+
+
+  - id: 1  # Automatically created id
+    title: Unten
+#    icon: mdi:arrow-down-bold
+    cards:
+
+
+############################# Top Info Picture Element
+
+
+      - id: a4266e95fe8e47f8802asdfasdfbb9c9353643f4  # Automatically created id
+        type: picture-elements
+        image: /local/lovelace/background_grey.png
+#         title: Wohnzimmer
+        panel: true
+        show_header_toggle: false
+        style:
+#          width: 50%
+#          height: 10%
+          size: 10%
+        elements:
+# Temp Wohnzimmer
+          - type: state-label
+            title: Wohnzimmer
+            icon: mdi:celsius
+#            prefix: ' Grad'
+#             tap_action: toggle
+            entity: sensor.tado_unten_temperature
+            style:
+              top: 50%
+              left: 70%
+              font-size: 140%
+# Balkontür Icon
+          - type: state-icon
+            title: Balkontüre
+            icon: mdi:door
+#             tap_action: toggle
+            entity: sensor.balkontuer_status
+            style:
+              top: 50%
+              left: 5%
+              size: 500%
+              font-color: '#ee3b3b'
+
+# Balkontür Status
+          - type: state-label
+            title: Balkontür
+            icon: mdi:celsius
+#            prefix: ' Grad'
+#             tap_action: toggle
+            entity: sensor.balkontuer_status
+            style:
+              top: 55%
+              left: 20%
+              font-size: 100%
+
+              
+            
+# TOP BUTTONS
+# 1. Reihe 
+      - id: 92394aab14074469ac4cecb5bb3ca10045444  # Automatically created id
+        type: horizontal-stack
+#        title: TEST
+
+        cards:
+
+#   MUTE
+          - type: entity-button
+            entity: script.stopmediaunten
+            icon: mdi:power
+            color: rgb(28, 128, 199)
+            name: MUTE
+            tap_action:
+              action: call-service
+              service: script.turn_on
+              service_data:
+                entity_id: script.stopmediaunten          
+          
+
+
+#   FM 4 unten
+          - type: entity-button
+            entity: script.sonosfm4unten
+            icon: mdi:speaker
+            color: rgb(28, 128, 199)
+            name: FM 4
+            tap_action:
+              action: call-service
+              service: script.turn_on
+              service_data:
+                entity_id: script.sonosfm4unten            
+
+# TOP BUTTONS
+# 2.Reihe 
+      - id: 92394cdx5613264469ac4cecb5bb3ca10045444  # Automatically created id
+        type: horizontal-stack
+#        title: 
+
+        cards:
+
+#   Ö3 unten
+          - type: entity-button
+            entity: script.sonosoe3unten
+            icon: mdi:speaker
+            color: rgb(28, 128, 199)
+            name: Ö3
+            tap_action:
+              action: call-service
+              service: script.turn_on
+              service_data:
+                entity_id: script.sonosoe3unten
+            
+#   Ton auf TV schalten
+          - type: entity-button
+            entity: script.fernsehschaun
+            icon: mdi:television-classic
+            color: rgb(28, 128, 199)
+            name: TV
+            tap_action:
+              action: call-service
+              service: script.turn_on
+              service_data:
+                entity_id: script.fernsehschaun 
+# TOP BUTTONS
+# 3. Reihe 
+      - id: 92394aab13264469ac4cecb5bb3ca10045444  # Automatically created id
+        type: horizontal-stack
+#        title: TE
+
+        cards:
+
+#   AUS
+          - type: entity-button
+            entity: script.shutdownunten
+            icon: mdi:power
+            color: rgb(28, 128, 199)
+            name: AUS
+            tap_action:
+              action: call-service
+              service: script.turn_on
+              service_data:
+                entity_id: script.shutdownunten  
+
+# jalousie1
+          - type: entity-button
+            entity: script.shutdownunten
+            icon: mdi:home
+            color: rgb(28, 128, 199)
+            name: SCENE 1
+            tap_action:
+              action: call-service
+              service: script.turn_on
+              service_data:
+                entity_id: script.blinds45_unten
+                
+      - id: 927a6f94307048a8ae8c73d4a890738c  # Automatically created id
+        type: entities
+        title: Jalousien
+        show_header_toggle: false
+        entities:
+          - cover.fibaro_system_unknown_type_1d01_id_1000_level
+          - cover.fibaro_system_fgrm222_roller_shutter_controller_2_level                
+                
+      - id: 92394aab935517769ac4cecb5bb3ca10045444  # Automatically created id
+        type: horizontal-stack
+#        title: 4.
+
+        cards:
+
+          - type: entity-button
+            entity: script.closeblinds_wohnzimmer
+            name: Wohnzimmer zuklappen
+            icon: mdi:arrow-bottom-right
+            color: rgb(28, 128, 199)
+            tap_action:
+              action: call-service
+              service: script.turn_on
+              service_data:
+                entity_id: script.closeblinds_wohnzimmer
+
+
+          - type: entity-button
+            entity: script.openblinds_wohnzimmer
+            name: Wohnzimmer aufklappen
+            icon: mdi:arrow-top-right
+            color: rgb(28, 128, 199)
+            tap_action:
+              action: call-service
+              service: script.turn_on
+              service_data:
+                entity_id: script.openblinds_wohnzimmer 
+                
+          - type: entity-button
+            entity: script.openblinds_terasse
+            name: Terrasse aufklappen
+            icon: mdi:arrow-top-right
+            color: rgb(28, 128, 199)
+            tap_action:
+              action: call-service
+              service: script.turn_on
+              service_data:
+                entity_id: script.openblinds_terasse      
+          - type: entity-button
+            entity: script.closeblinds_terasse
+            name: Terrasse zuklappen
+            icon: mdi:arrow-bottom-right
+            color: rgb(28, 128, 199)
+            tap_action:
+              action: call-service
+              service: script.turn_on
+              service_data:
+                entity_id: script.closeblinds_terasse
+
+               
+# 4. Reihe 
+      - id: 92394aab93464469ac4cecb5bb3ca10045444  # Automatically created id
+        type: horizontal-stack
+#        title: 4.
+
+        cards:
+
+         - type: entities
+           title: LICHT
+           show_header_toggle: false
+           entities:
+             - type: custom:fold-entity-row
+               head:
+                 type: section
+                 label: ALLE
+               group_config:
+                 secondary_info: last-changed
+               items:
+                 - light.lampe
+                 - light.ecklampe
+                 - light.tv_backlight
+                 - switch.fibaro_system_fgs223_double_relay_switch_6
+                 - switch.fibaro_system_fgs223_double_relay_switch_5
+
+
+ 
+                
+
+########################## Media Player
+
+      - id: 12a10eacd4e04aa2a94dd5656777099f  # Automatically created id
+        type: custom:mini-media-player
+        entity: media_player.wohnzimmer
+        icon: mdi:cast
+        artwork_border: true
+        power_color: true
+        show_source: true
+        artwork: cover
+        max_volume: 70        
+
+#      - id: 12jjglshhd994  # Automatically created id
+#        type: media-control
+#        entity: media_player.samsung_tv_remote
+               
+               
+               
+               
+# 3. Reihe            
+# Jalousien unten 
+        
+      # - id: 92394aab14074469ac4c3kd7bb3ca100  # Automatically created id
+        # type: horizontal-stack
+        # title: Jalousien Buttons
+        # cards:
+
+           
+#################################################################################        
+
+
+
+################# Buttons Jalousie AUF ZU STOP für beide Jalousien gemeinsam
+        
+
+              
+              
+              
+################# LIVE Kamera Wohnzimmer ##########################              
+
+
+
+
+       
+########################## Lichter
+
+      - type: entities
+        title: Lichter
+        entities:
+        - entity: light.lampe
+          name: Couchlicht
+          type: custom:slider-entity-row
+        - entity: light.tv_backlight
+          name: TV Licht
+          type: custom:slider-entity-row
+        - entity: switch.fibaro_system_fgs223_double_relay_switch_4
+          name: Essbereich
+          type: custom:slider-entity-row
+        - entity: switch.fibaro_system_fgs223_double_relay_switch_3
+          name: Küche
+          type: custom:slider-entity-row
+        - entity: light.ecklampe
+          name: Turntables
+          type: custom:slider-entity-row
+
+
+
+          
+################### Jalousien normal View
+        
+
+
+
+
+
+
+
+################
+# OBEN                                                                                                       
+##############################################################################
+
+
+
+  - id: 2  # Automatically created id
+    title: Oben
+#    icon: mdi:arrow-up-bold
+    cards:
+ 
+############################# Top Info Panel
+
+      - id: a4266e95fe8e47f8802bb9c9353643f4  # Automatically created id
+        type: picture-elements
+        image: /local/lovelace/background_grey.png
+#         title: Wohnzimmer
+        panel: true
+        show_header_toggle: false
+        style:
+          size: 20%
+        elements:
+# Temp Zimmer
+          - type: state-label
+            title: Zimmer
+            icon: mdi:celsius
+#            prefix: ' Grad'
+#             tap_action: toggle
+            entity: sensor.aeon_labs_zw100_multisensor_6_temperature
+            style:
+              top: 50%
+              left: 70%
+              font-size: 140%
+                           
+# Balkontür Icon
+          - type: state-icon
+            title: Fenster Schlafzimmer
+            icon: mdi:window-closed
+#            prefix: ' Grad'
+#             tap_action: toggle
+            entity: sensor.fenster_sz_status
+            style:
+              top: 55%
+              left: 5%
+              font-size: 100% 
+
+# Balkontür Status
+          - type: state-label
+            title: Balkontür
+            icon: mdi:door
+#            prefix: ' Grad'
+#             tap_action: toggle
+            entity: sensor.fenster_sz_status
+            style:
+              top: 55%
+              left: 20%
+              font-size: 100% 
+    
+######################################### 1. Reihe    
+
+      - id: 20db8999d50c4a438114b0a76c6d8b78  # Automatically created id
+        type: horizontal-stack
+
+########################
+##### Buttons
+########################
+
+
+        cards:
+
+#   oben aus
+          - type: entity-button
+            entity: script.shutdownup
+            icon: mdi:power
+            color: rgb(28, 128, 199)
+            name: AUS
+            tap_action:
+              action: call-service
+              service: script.turn_on
+              service_data:
+                entity_id: script.shutdownup          
+
+#   Ö3 Bad
+          - type: entity-button
+            entity: script.sonosoe3oben
+            icon: mdi:speaker
+            color: rgb(28, 128, 199)
+            name: Ö3
+            tap_action:
+              action: call-service
+              service: script.turn_on
+              service_data:
+                entity_id: script.sonosoe3oben           
+
+
+###### 2. Reihe    
+
+      - id: 20db8999d34xpa438114b0a76c6d8b78  # Automatically created id
+        type: horizontal-stack
+        cards:
+#   Heizung Bad
+          - type: entity-button
+            entity:  switch.fibaro_system_fgwpe_f_wall_plug_gen5_switch
+            icon: mdi:radiator
+            color: rgb(28, 128, 199)
+            name: BAD
+         
+#   FM4 Bad
+          - type: entity-button
+            entity: script.sonosfm4oben
+            icon: mdi:speaker
+            color: rgb(28, 128, 199)
+            name: FM4
+            tap_action:
+              action: call-service
+              service: script.turn_on
+              service_data:
+                entity_id: script.sonosfm4oben          
+
+
+# 2. Reihe
+
+      # - id: b01cac078df549edb10f1f9b8e4b4027  # Automatically created id
+        # type: horizontal-stack
+        # cards:
+
+
+#################### 2. Reihe ENDE
+
+# Bettlicht
+
+#      - id: 1263344
+#        type: light
+#        entity: light.hue_lightstrip_plus_1
+
+      - id: 2400277f2ff64485aa180a0f14f73416  # Automatically created id
+        type: entities
+#        title: noname
+        show_header_toggle: false
+        entities:
+          # - sensor.netatmo_base_oben_temperature
+          # - sensor.netatmo_base_base_oben_humidity
+          - sensor.fenster_sz_status
+          - switch.stecker1_switch
+
+# Lichter Oben
+
+      - id: dc6398d9ea274d57abfb053764cdaff4  # Automatically created id
+        type: entities
+        title: Lichteroben
+        show_header_toggle: true
+        entities:
+          - light.hue_lightstrip_plus_1
+          - light.stiegenhaus
+
+
+
+      - id: ee52e5b1078b415c8f6fac7891f399a9  # Automatically created id
+        type: custom:mini-media-player
+        entity: media_player.oben
+        icon: mdi:cast
+        artwork_border: true
+        power_color: true
+        show_source: true
+        artwork: cover
+        max_volume: 70
+
+
+      - id: kkajjnx4885
+        type: entities
+        entities:
+         - entity: light.lampe
+  
+         - type: "custom:button-entity-row"
+           buttons:
+            - scene.daylight
+            - scene.entspannen
+            - scene.couch_lesen
+
+########################### TESTING ################################## TESTING
+
+
+
+
+
+
+
+
+
+        
+        
+        
+        
